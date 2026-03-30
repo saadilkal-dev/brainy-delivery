@@ -78,7 +78,7 @@ export default function Dashboard() {
           {/* Active Blockers — only interactive item */}
           <button
             onClick={() => navigate(`/projects/${id}/blockers`)}
-            className="flex items-center gap-4 lg:px-6 rounded-lg -m-2 p-2 hover:bg-destructive/5 transition-colors group cursor-pointer text-left"
+            className="flex items-center gap-4 lg:px-6 rounded-lg -m-2 p-2 hover:bg-destructive/5 transition-colors group cursor-pointer text-left relative"
           >
             <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 group-hover:bg-destructive/15 transition-colors">
               <ShieldAlert className="h-5 w-5 text-destructive" />
@@ -86,7 +86,9 @@ export default function Dashboard() {
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Blockers</p>
               <p className="text-2xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
-              <p className="text-xs text-muted-foreground group-hover:text-destructive/70 transition-colors">View details →</p>
+            </div>
+            <div className="absolute top-2 right-2 h-8 w-8 rounded-full border border-border flex items-center justify-center group-hover:border-destructive/30 transition-colors">
+              <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-destructive transition-colors" />
             </div>
           </button>
 
