@@ -118,7 +118,7 @@ export function AppSidebar() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-card border-r border-border">
+      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 glass-sidebar border-r border-border theme-transition">
         {sidebarContent}
       </aside>
     </>
