@@ -93,13 +93,12 @@ export default function Dashboard() {
               const isExpanded = expandedModule === mod.id;
               const hasExpanded = expandedModule !== null;
               return (
-                <motion.div
+                <div
                   key={mod.id}
-                  layout
                   className={cn(
-                    'rounded-lg border border-border bg-card overflow-hidden transition-all duration-300 relative',
+                    'rounded-lg border border-border bg-card overflow-visible relative transition-all duration-300',
                     isExpanded ? 'z-20 ring-2 ring-primary/30 shadow-xl shadow-primary/10 scale-[1.02]' : '',
-                    hasExpanded && !isExpanded ? 'opacity-40 blur-[1px]' : ''
+                    hasExpanded && !isExpanded ? 'opacity-40 blur-[1px] pointer-events-none' : ''
                   )}
                 >
                   <button onClick={() => setExpandedModule(isExpanded ? null : mod.id)} className="w-full p-4 text-left">
@@ -120,13 +119,13 @@ export default function Dashboard() {
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="overflow-hidden"
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="absolute left-0 right-0 top-full mt-1 rounded-b-lg border border-border bg-card shadow-lg z-30"
                       >
-                        <div className="border-t border-border p-4 space-y-2 text-sm">
+                        <div className="p-4 space-y-2 text-sm">
                           {mod.assumptions?.map(a => (
                             <div key={a.id} className="flex items-center gap-2">
                               <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>{a.status}</StatusBadge>
@@ -143,7 +142,7 @@ export default function Dashboard() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               );
             })}
           </div>
