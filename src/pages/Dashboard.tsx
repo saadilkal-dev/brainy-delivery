@@ -10,7 +10,7 @@ import { StatusBadge, getModuleStatusVariant, getExtractionTypeVariant, getSourc
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, AlertTriangle, Activity, Calendar, Target, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +34,18 @@ export default function Dashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!expandedModule) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('[data-module-card]');
+      if (!card) setExpandedModule(null);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [expandedModule]);
 
   const dashQ = useQuery({ queryKey: ['dashboard', id], queryFn: () => getDashboard(id!), enabled: !!id });
   const modsQ = useQuery({ queryKey: ['modules', id], queryFn: () => getModules(id!), enabled: !!id });
@@ -94,6 +106,7 @@ export default function Dashboard() {
               const hasExpanded = expandedModule !== null;
               return (
                 <div
+                  data-module-card
                   key={mod.id}
                   className={cn(
                     'rounded-lg border border-border bg-card overflow-visible relative transition-all duration-300',
