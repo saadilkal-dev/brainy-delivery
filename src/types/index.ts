@@ -90,6 +90,30 @@ export interface Blocker {
   overdue_dependencies: Dependency[];
 }
 
+export interface MeetingParticipant {
+  name: string;
+  role: string;
+  avatar_color: string;
+}
+
+export interface Meeting {
+  id: string;
+  project_id: string;
+  title: string;
+  source: 'google_meet' | 'google_chat' | 'calendar';
+  date: string;
+  duration_minutes: number;
+  participants: MeetingParticipant[];
+  summary: string;
+  key_points: string[];
+  decisions: string[];
+  action_items: { text: string; assignee: string; due?: string }[];
+  blockers_identified: string[];
+  mood: 'positive' | 'neutral' | 'concerning';
+  extractions: Extraction[];
+  created_at: string;
+}
+
 export interface Nudge {
   id: string;
   dependency_id: string;

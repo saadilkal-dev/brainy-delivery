@@ -1,4 +1,4 @@
-import type { Project, Module, Extraction, DashboardData, Blocker, Nudge } from '@/types';
+import type { Project, Module, Extraction, DashboardData, Blocker, Nudge, Meeting } from '@/types';
 
 export const mockProjects: Project[] = [
   {
