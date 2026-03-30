@@ -127,14 +127,14 @@ export default function Dashboard() {
                       >
                         <div className="p-4 space-y-2 text-sm">
                           {mod.assumptions?.map(a => (
-                            <div key={a.id} className="flex items-center gap-2">
-                              <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>{a.status}</StatusBadge>
+                            <div key={a.id} className="flex items-start gap-3">
+                              <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'} className="shrink-0 mt-0.5 min-w-[80px] justify-center">{a.status}</StatusBadge>
                               <span className="text-muted-foreground">{a.text}</span>
                             </div>
                           ))}
                           {mod.dependencies?.map(d => (
-                            <div key={d.id} className="flex items-center gap-2">
-                              <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>{d.status}</StatusBadge>
+                            <div key={d.id} className="flex items-start gap-3">
+                              <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'} className="shrink-0 mt-0.5 min-w-[80px] justify-center">{d.status}</StatusBadge>
                               <span className="text-muted-foreground">{d.description}</span>
                             </div>
                           ))}
