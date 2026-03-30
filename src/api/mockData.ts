@@ -265,7 +265,147 @@ Project Manager`,
   },
 ];
 
-// Local state store for mutations
+export const mockMeetings: Meeting[] = [
+  {
+    id: 'mtg-1',
+    project_id: 'proj-1',
+    title: 'Daily Standup — Sprint 4',
+    source: 'google_meet',
+    date: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    duration_minutes: 18,
+    participants: [
+      { name: 'Sarah K.', role: 'PM', avatar_color: '#3B82F6' },
+      { name: 'Dev A', role: 'Frontend', avatar_color: '#10B981' },
+      { name: 'Dev B', role: 'Backend', avatar_color: '#F59E0B' },
+    ],
+    summary: 'Quick sync on Product Catalog blockers. DB schema still pending from client. Design team locked in card-based layout. Reporting dashboard deprioritized in favor of onboarding.',
+    key_points: [
+      'Product Catalog module blocked — DB schema overdue by 20 days',
+      'Card-based layout confirmed over table view',
+      'Onboarding flow prioritized above Reporting Dashboard',
+      'Dev A will assume PostgreSQL if schema not received by Friday',
+    ],
+    decisions: [
+      'Go with card-based layout for product catalog',
+      'Deprioritize reporting dashboard',
+      'Follow up with Daikin IT on schema by EOD',
+    ],
+    action_items: [
+      { text: 'Follow up with Daikin IT on DB schema', assignee: 'Sarah K.', due: '2026-03-30' },
+      { text: 'Update component structure for card layout', assignee: 'Dev B', due: '2026-04-01' },
+      { text: 'Begin PostgreSQL assumption build if no schema by Friday', assignee: 'Dev A', due: '2026-04-04' },
+    ],
+    blockers_identified: ['Database schema from Daikin IT — 20 days overdue'],
+    mood: 'concerning',
+    extractions: [],
+    created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'mtg-2',
+    project_id: 'proj-1',
+    title: 'Client Review — Sprint 3 Demo',
+    source: 'google_meet',
+    date: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
+    duration_minutes: 45,
+    participants: [
+      { name: 'Sarah K.', role: 'PM', avatar_color: '#3B82F6' },
+      { name: 'Dev A', role: 'Frontend', avatar_color: '#10B981' },
+      { name: 'Tanaka-san', role: 'Client', avatar_color: '#EF4444' },
+      { name: 'Yuki M.', role: 'Client', avatar_color: '#8B5CF6' },
+    ],
+    summary: 'Sprint 3 demo went well. Client approved onboarding flow designs. Discussed timeline for schema delivery. Client committed to Wednesday but delivery is uncertain.',
+    key_points: [
+      'Onboarding flow designs approved by client',
+      'Client acknowledged schema delay',
+      'New requirement: multi-language support for onboarding (JP/EN)',
+      'Client satisfied with notification system demo',
+    ],
+    decisions: [
+      'Approved onboarding flow — move to implementation',
+      'Add Japanese language support to onboarding scope',
+      'Schema delivery committed for March 12',
+    ],
+    action_items: [
+      { text: 'Start onboarding implementation', assignee: 'Dev A', due: '2026-03-28' },
+      { text: 'Scope i18n effort for JP/EN', assignee: 'Dev B', due: '2026-03-29' },
+      { text: 'Send schema reminder to Daikin IT', assignee: 'Sarah K.', due: '2026-03-27' },
+    ],
+    blockers_identified: [],
+    mood: 'positive',
+    extractions: [],
+    created_at: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'mtg-3',
+    project_id: 'proj-1',
+    title: 'Architecture Discussion — Service Layer',
+    source: 'google_chat',
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    duration_minutes: 32,
+    participants: [
+      { name: 'Dev A', role: 'Frontend', avatar_color: '#10B981' },
+      { name: 'Dev B', role: 'Backend', avatar_color: '#F59E0B' },
+      { name: 'Dev C', role: 'DevOps', avatar_color: '#EC4899' },
+    ],
+    summary: 'Discussed service layer architecture for the portal. Decided on microservices approach with API gateway. Concerns raised about deployment complexity.',
+    key_points: [
+      'Microservices architecture selected for scalability',
+      'API gateway pattern for unified client interface',
+      'Docker + K8s for deployment pipeline',
+      'Concern: deployment complexity may impact timeline',
+    ],
+    decisions: [
+      'Use microservices with API gateway',
+      'Kubernetes deployment with Helm charts',
+      'Start with 3 core services: auth, catalog, notifications',
+    ],
+    action_items: [
+      { text: 'Draft architecture diagram', assignee: 'Dev C', due: '2026-03-28' },
+      { text: 'Set up K8s staging cluster', assignee: 'Dev C', due: '2026-04-01' },
+      { text: 'Define API contracts for core services', assignee: 'Dev B', due: '2026-03-30' },
+    ],
+    blockers_identified: [],
+    mood: 'neutral',
+    extractions: [],
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'mtg-4',
+    project_id: 'proj-2',
+    title: 'CRM Kickoff — Requirements Gathering',
+    source: 'google_meet',
+    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    duration_minutes: 60,
+    participants: [
+      { name: 'Alex P.', role: 'PM', avatar_color: '#3B82F6' },
+      { name: 'Jordan T.', role: 'Lead Dev', avatar_color: '#10B981' },
+      { name: 'Maya R.', role: 'UX Designer', avatar_color: '#F59E0B' },
+    ],
+    summary: 'Initial kickoff for CRM revamp. Discussed current pain points, user personas, and high-level timeline. Agreed on 4 core modules.',
+    key_points: [
+      'Current CRM has poor search and filtering',
+      'Need mobile-responsive design',
+      '4 core modules: contacts, deals, reporting, integrations',
+      'Target: MVP by end of June',
+    ],
+    decisions: [
+      'React + TypeScript for frontend',
+      'Modular architecture for phased delivery',
+      'Start with contacts module',
+    ],
+    action_items: [
+      { text: 'Create user personas document', assignee: 'Maya R.', due: '2026-03-28' },
+      { text: 'Set up project repository', assignee: 'Jordan T.', due: '2026-03-27' },
+      { text: 'Draft module breakdown', assignee: 'Alex P.', due: '2026-03-29' },
+    ],
+    blockers_identified: [],
+    mood: 'positive',
+    extractions: [],
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+
 let _projects = [...mockProjects];
 let _modules = [...mockModules];
 let _extractions = [...mockExtractions];
