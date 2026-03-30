@@ -62,35 +62,57 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-lg border border-border bg-card p-5 flex items-center gap-4">
-          <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
-          <div>
-            <p className="text-sm text-muted-foreground">Overall Progress</p>
-            <p className="text-xl font-bold">{dash.overall_progress.completed}/{dash.overall_progress.total}</p>
-            <p className="text-xs text-muted-foreground">modules complete</p>
+      {/* Stats Strip */}
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x divide-border">
+          {/* Overall Progress */}
+          <div className="flex items-center gap-4 lg:px-6 first:lg:pl-0 last:lg:pr-0">
+            <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Progress</p>
+              <p className="text-2xl font-bold tabular-nums">{dash.overall_progress.completed}<span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span></p>
+              <p className="text-xs text-muted-foreground">modules complete</p>
+            </div>
           </div>
-        </div>
 
-        <button onClick={() => navigate(`/projects/${id}/blockers`)} className="rounded-lg border border-border bg-card p-5 text-left hover:border-destructive/50 transition-colors">
-          <ShieldAlert className="h-5 w-5 text-destructive mb-2" />
-          <p className="text-sm text-muted-foreground">Active Blockers</p>
-          <p className="text-3xl font-bold text-destructive">{dash.active_blockers}</p>
-        </button>
+          {/* Active Blockers — only interactive item */}
+          <button
+            onClick={() => navigate(`/projects/${id}/blockers`)}
+            className="flex items-center gap-4 lg:px-6 rounded-lg -m-2 p-2 hover:bg-destructive/5 transition-colors group cursor-pointer text-left"
+          >
+            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 group-hover:bg-destructive/15 transition-colors">
+              <ShieldAlert className="h-5 w-5 text-destructive" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Blockers</p>
+              <p className="text-2xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
+              <p className="text-xs text-muted-foreground group-hover:text-destructive/70 transition-colors">View details →</p>
+            </div>
+          </button>
 
-        <div className="rounded-lg border border-border bg-card p-5">
-          <Calendar className="h-5 w-5 text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground">Predicted Delivery</p>
-          <p className={cn('text-xl font-bold', driftColor)}>{dash.predicted_delivery.date}</p>
-          <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
-        </div>
+          {/* Predicted Delivery */}
+          <div className="flex items-center gap-4 lg:px-6">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivery</p>
+              <p className={cn('text-lg font-bold tabular-nums', driftColor)}>{dash.predicted_delivery.date}</p>
+              <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
+            </div>
+          </div>
 
-        <div className="rounded-lg border border-border bg-card p-5">
-          <Activity className="h-5 w-5 text-primary mb-2" />
-          <p className="text-sm text-muted-foreground">Brain Activity</p>
-          <p className="text-3xl font-bold">{dash.brain_activity.count}</p>
-          <p className="text-xs text-muted-foreground">extractions this week</p>
+          {/* Brain Activity */}
+          <div className="flex items-center gap-4 lg:px-6">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Activity className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Activity</p>
+              <p className="text-2xl font-bold tabular-nums">{dash.brain_activity.count}</p>
+              <p className="text-xs text-muted-foreground">extractions this week</p>
+            </div>
+          </div>
         </div>
       </div>
 
