@@ -1,5 +1,6 @@
 import { Bell } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getDashboard } from '@/api/dashboard';
 
