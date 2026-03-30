@@ -108,7 +108,7 @@ export function AppSidebar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-background/80" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-60 h-full bg-card border-r border-border">
+          <div className="relative w-60 h-full glass-sidebar border-r border-border theme-transition">
             <button onClick={() => setMobileOpen(false)} className="absolute top-3 right-3 text-muted-foreground">
               <X className="h-5 w-5" />
             </button>
