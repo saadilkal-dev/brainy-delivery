@@ -114,7 +114,7 @@ export default function Dashboard() {
                     hasExpanded && !isExpanded ? 'opacity-40 blur-[1px] pointer-events-none' : ''
                   )}
                 >
-                  <button onClick={() => setExpandedModule(isExpanded ? null : mod.id)} className="w-full p-4 text-left">
+                  <button onClick={() => setExpandedModule(isExpanded ? null : mod.id)} className="w-full h-full p-4 text-left">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-sm">{mod.name}</h3>
                       <StatusBadge variant={getModuleStatusVariant(mod.status)}>{mod.status.replace('_', ' ')}</StatusBadge>
