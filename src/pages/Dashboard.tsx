@@ -97,7 +97,7 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivery</p>
-              <p className={cn('text-lg font-bold tabular-nums', driftColor)}>{dash.predicted_delivery.date}</p>
+              <p className={cn('text-2xl font-bold tabular-nums', driftColor)}>{dash.predicted_delivery.date}</p>
               <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
             </div>
           </div>
