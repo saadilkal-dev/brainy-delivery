@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 import { ChevronDown, AlertTriangle, Activity, Calendar, Target, ShieldAlert } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function ProgressRing({ value, total, status }: { value: number; total: number; status: string }) {
   const pct = total > 0 ? (value / total) * 100 : 0;
@@ -87,42 +88,64 @@ export default function Dashboard() {
         {modsQ.isLoading ? <LoadingSpinner /> : modules.length === 0 ? (
           <EmptyState title="No modules yet" description="Go to the Plan page to create your first module." actionLabel="Go to Plan" onAction={() => navigate(`/projects/${id}/plan`)} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules.map(mod => (
-              <div key={mod.id} className="rounded-lg border border-border bg-card overflow-hidden">
-                <button onClick={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)} className="w-full p-4 text-left">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-sm">{mod.name}</h3>
-                    <StatusBadge variant={getModuleStatusVariant(mod.status)}>{mod.status.replace('_', ' ')}</StatusBadge>
-                  </div>
-                  {mod.owner && <p className="text-xs text-muted-foreground mb-2">{mod.owner}</p>}
-                  <ProgressBar value={mod.progress_pct} className="mb-2" />
-                  {mod.status === 'blocked' && mod.blocker_reason && (
-                    <p className="text-xs text-destructive mt-1">⛔ {mod.blocker_reason}</p>
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {modules.map(mod => {
+              const isExpanded = expandedModule === mod.id;
+              const hasExpanded = expandedModule !== null;
+              return (
+                <motion.div
+                  key={mod.id}
+                  layout
+                  className={cn(
+                    'rounded-lg border border-border bg-card overflow-hidden transition-all duration-300 relative',
+                    isExpanded ? 'z-20 ring-2 ring-primary/30 shadow-xl shadow-primary/10 scale-[1.02]' : '',
+                    hasExpanded && !isExpanded ? 'opacity-40 blur-[1px]' : ''
                   )}
-                  {mod.assumptions && mod.assumptions.length > 0 && (
-                    <StatusBadge variant="amber" className="mt-1">⚠ {mod.assumptions.length} assumptions</StatusBadge>
-                  )}
-                  <ChevronDown className={cn('h-4 w-4 text-muted-foreground mt-2 transition-transform', expandedModule === mod.id && 'rotate-180')} />
-                </button>
-                {expandedModule === mod.id && (
-                  <div className="border-t border-border p-4 space-y-2 text-sm">
-                    {mod.assumptions?.map(a => (
-                      <div key={a.id} className="flex items-center gap-2">
-                        <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>{a.status}</StatusBadge>
-                        <span className="text-muted-foreground">{a.text}</span>
-                      </div>
-                    ))}
-                    {mod.dependencies?.map(d => (
-                      <div key={d.id} className="flex items-center gap-2">
-                        <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>{d.status}</StatusBadge>
-                        <span className="text-muted-foreground">{d.description}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                >
+                  <button onClick={() => setExpandedModule(isExpanded ? null : mod.id)} className="w-full p-4 text-left">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-sm">{mod.name}</h3>
+                      <StatusBadge variant={getModuleStatusVariant(mod.status)}>{mod.status.replace('_', ' ')}</StatusBadge>
+                    </div>
+                    {mod.owner && <p className="text-xs text-muted-foreground mb-2">{mod.owner}</p>}
+                    <ProgressBar value={mod.progress_pct} className="mb-2" />
+                    {mod.status === 'blocked' && mod.blocker_reason && (
+                      <p className="text-xs text-destructive mt-1">⛔ {mod.blocker_reason}</p>
+                    )}
+                    {mod.assumptions && mod.assumptions.length > 0 && (
+                      <StatusBadge variant="amber" className="mt-1">⚠ {mod.assumptions.length} assumptions</StatusBadge>
+                    )}
+                    <ChevronDown className={cn('h-4 w-4 text-muted-foreground mt-2 transition-transform', isExpanded && 'rotate-180')} />
+                  </button>
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border-t border-border p-4 space-y-2 text-sm">
+                          {mod.assumptions?.map(a => (
+                            <div key={a.id} className="flex items-center gap-2">
+                              <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>{a.status}</StatusBadge>
+                              <span className="text-muted-foreground">{a.text}</span>
+                            </div>
+                          ))}
+                          {mod.dependencies?.map(d => (
+                            <div key={d.id} className="flex items-center gap-2">
+                              <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>{d.status}</StatusBadge>
+                              <span className="text-muted-foreground">{d.description}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>
