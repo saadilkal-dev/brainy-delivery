@@ -101,7 +101,7 @@ export default function Ingestion() {
 }
 
 function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
-  const [expanded, setExpanded] = useState(index === 0);
+  const [expanded, setExpanded] = useState(false);
   const SourceIcon = sourceIcon[meeting.source];
   const mood = moodConfig[meeting.mood];
   const MoodIcon = mood.icon;
