@@ -406,10 +406,12 @@ export const mockMeetings: Meeting[] = [
 ];
 
 
+// Local state store for mutations
 let _projects = [...mockProjects];
 let _modules = [...mockModules];
 let _extractions = [...mockExtractions];
 let _nudges = [...mockNudges];
+let _meetings = [...mockMeetings];
 
 function generateId() {
   return `mock-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
