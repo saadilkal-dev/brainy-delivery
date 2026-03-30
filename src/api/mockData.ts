@@ -535,4 +535,12 @@ export const mockApi = {
     return nudge;
   },
   getNudges: async (projectId: string) => _nudges,
+
+  // Meetings
+  getMeetings: async (projectId: string) => {
+    return _meetings
+      .filter(m => m.project_id === projectId)
+      .map(m => ({ ...m, extractions: _extractions.filter(e => e.project_id === projectId && e.source_name === m.title) }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
 };
