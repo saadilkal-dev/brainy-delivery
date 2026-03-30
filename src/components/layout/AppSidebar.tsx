@@ -36,7 +36,8 @@ export function AppSidebar() {
       </div>
 
       {id && projects && projects.length > 0 && (
-        <div className="p-3 border-b border-border">
+        <div className="px-3 pt-4 pb-3 border-b border-border space-y-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">Project</span>
           <div className="relative">
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
