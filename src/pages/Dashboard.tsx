@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 import { ChevronDown, AlertTriangle, Activity, Calendar, Target, ShieldAlert } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function ProgressRing({ value, total, status }: { value: number; total: number; status: string }) {
   const pct = total > 0 ? (value / total) * 100 : 0;
