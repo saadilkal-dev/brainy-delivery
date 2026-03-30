@@ -106,6 +106,7 @@ export default function Dashboard() {
               const hasExpanded = expandedModule !== null;
               return (
                 <div
+                  data-module-card
                   key={mod.id}
                   className={cn(
                     'rounded-lg border border-border bg-card overflow-visible relative transition-all duration-300',
