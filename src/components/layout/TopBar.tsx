@@ -30,9 +30,9 @@ export function TopBar() {
     <header className="h-12 border-b border-border flex items-center justify-between px-6 bg-card/50 backdrop-blur-sm sticky top-0 z-30">
       <div className="flex items-center gap-3 md:pl-0 pl-10">
         {/* Live dot */}
-        <span className="relative flex h-1.5 w-1.5 shrink-0">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(195_100%_50%)] opacity-60" />
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[hsl(195_100%_50%)]" />
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-60" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-success shadow-[0_0_6px_hsl(var(--success)/0.8)]" />
         </span>
         <h1 className="font-heading text-base font-semibold tracking-tight text-foreground">{title}</h1>
       </div>
