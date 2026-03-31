@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getDashboard } from '@/api/dashboard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 
 const pageTitles: Record<string, string> = {
@@ -49,6 +50,7 @@ export function TopBar() {
             {blockerCount} blocker{blockerCount > 1 ? 's' : ''}
           </button>
         )}
+        <ThemeToggle />
         <div className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider hidden sm:block">
           {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </div>
