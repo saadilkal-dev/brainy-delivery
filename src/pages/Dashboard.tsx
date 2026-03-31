@@ -62,57 +62,51 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Strip */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x divide-border">
-          {/* Overall Progress */}
-          <div className="flex items-center gap-4 lg:px-6 first:lg:pl-0 last:lg:pr-0">
-            <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Progress</p>
-              <p className="text-2xl font-bold tabular-nums">{dash.overall_progress.completed}<span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span></p>
-              <p className="text-xs text-muted-foreground">modules complete</p>
-            </div>
+      {/* Stats Tiles */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Progress */}
+        <div className="rounded-2xl bg-primary/10 p-6 space-y-4">
+          <h3 className="text-base font-bold text-primary">Progress</h3>
+          <p className="text-3xl font-bold tabular-nums text-foreground">
+            {dash.overall_progress.completed}
+            <span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span>
+          </p>
+          <div className="flex items-center gap-3">
+            <ProgressBar value={Math.round((dash.overall_progress.completed / dash.overall_progress.total) * 100)} className="flex-1" />
+            <span className="text-xs font-medium text-muted-foreground tabular-nums">
+              {Math.round((dash.overall_progress.completed / dash.overall_progress.total) * 100)}%
+            </span>
           </div>
+          <p className="text-xs text-muted-foreground">modules complete</p>
+        </div>
 
-          {/* Active Blockers — only interactive item */}
-          <button
-            onClick={() => navigate(`/projects/${id}/blockers`)}
-            className="flex items-center gap-4 lg:px-6 rounded-lg -m-2 p-2 hover:bg-destructive/5 transition-colors group cursor-pointer text-left"
-          >
-            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 group-hover:bg-destructive/15 transition-colors">
-              <ShieldAlert className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Blockers</p>
-              <p className="text-2xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
-              <p className="text-xs text-muted-foreground group-hover:text-destructive/70 transition-colors">View details →</p>
-            </div>
-          </button>
+        {/* Blockers */}
+        <button
+          onClick={() => navigate(`/projects/${id}/blockers`)}
+          className="rounded-2xl bg-destructive/10 p-6 space-y-4 text-left hover:bg-destructive/15 transition-colors group cursor-pointer"
+        >
+          <h3 className="text-base font-bold text-destructive">Blockers</h3>
+          <p className="text-3xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
+          <div className="h-1" />
+          <p className="text-xs text-muted-foreground group-hover:text-destructive/70 transition-colors">View details →</p>
+        </button>
 
-          {/* Predicted Delivery */}
-          <div className="flex items-center gap-4 lg:px-6">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center shrink-0">
-              <Calendar className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivery</p>
-              <p className={cn('text-xl font-bold tabular-nums whitespace-nowrap', driftColor)}>{dash.predicted_delivery.date}</p>
-              <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
-            </div>
-          </div>
+        {/* Delivery */}
+        <div className="rounded-2xl bg-warning/10 p-6 space-y-4">
+          <h3 className="text-base font-bold text-warning">Delivery</h3>
+          <p className={cn('text-xl font-bold tabular-nums whitespace-nowrap', driftColor)}>
+            {dash.predicted_delivery.date}
+          </p>
+          <div className="h-1" />
+          <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
+        </div>
 
-          {/* Brain Activity */}
-          <div className="flex items-center gap-4 lg:px-6">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Activity className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Activity</p>
-              <p className="text-2xl font-bold tabular-nums">{dash.brain_activity.count}</p>
-              <p className="text-xs text-muted-foreground">extractions this week</p>
-            </div>
-          </div>
+        {/* Activity */}
+        <div className="rounded-2xl bg-success/10 p-6 space-y-4">
+          <h3 className="text-base font-bold text-success">Activity</h3>
+          <p className="text-3xl font-bold tabular-nums">{dash.brain_activity.count}</p>
+          <div className="h-1" />
+          <p className="text-xs text-muted-foreground">extractions this week</p>
         </div>
       </div>
 
