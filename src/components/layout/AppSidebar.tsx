@@ -18,6 +18,18 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const selectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectorOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (selectorRef.current && !selectorRef.current.contains(e.target as Node)) {
+        setSelectorOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [selectorOpen]);
 
   const { data: projects } = useQuery({
     queryKey: ['projects'],
