@@ -65,14 +65,14 @@ export default function Dashboard() {
       {/* Stats Tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Progress */}
-        <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between">
-          <div className="space-y-1">
+        <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between min-h-[140px]">
+          <div className="flex flex-col h-full">
             <h3 className="font-semibold text-sm text-foreground">Progress</h3>
-            <p className="text-3xl font-bold tabular-nums text-foreground">
+            <p className="text-4xl font-bold tabular-nums text-foreground mt-2">
               {dash.overall_progress.completed}
-              <span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span>
+              <span className="text-muted-foreground font-normal text-xl">/{dash.overall_progress.total}</span>
             </p>
-            <p className="text-xs text-muted-foreground">modules complete</p>
+            <p className="text-xs text-muted-foreground mt-auto">modules complete</p>
           </div>
           <div className="pt-1">
             <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
@@ -82,30 +82,27 @@ export default function Dashboard() {
         {/* Blockers */}
         <button
           onClick={() => navigate(`/projects/${id}/blockers`)}
-          className="rounded-lg border border-border bg-card p-4 space-y-4 text-left hover:bg-accent transition-colors group cursor-pointer"
+          className="rounded-lg border border-border bg-card p-4 flex flex-col text-left hover:bg-accent transition-colors group cursor-pointer min-h-[140px]"
         >
           <h3 className="font-semibold text-sm text-foreground">Blockers</h3>
-          <p className="text-3xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
-          <div className="h-1" />
-          <p className="text-xs text-muted-foreground group-hover:text-foreground/70 transition-colors">View details →</p>
+          <p className="text-4xl font-bold text-destructive tabular-nums mt-2">{dash.active_blockers}</p>
+          <p className="text-xs text-muted-foreground group-hover:text-foreground/70 transition-colors mt-auto">View details →</p>
         </button>
 
         {/* Delivery */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+        <div className="rounded-lg border border-border bg-card p-4 flex flex-col min-h-[140px]">
           <h3 className="font-semibold text-sm text-foreground">Delivery</h3>
-          <p className={cn('text-xl font-bold tabular-nums whitespace-nowrap', driftColor)}>
+          <p className={cn('text-2xl font-bold tabular-nums whitespace-nowrap mt-2', driftColor)}>
             {dash.predicted_delivery.date}
           </p>
-          <div className="h-1" />
-          <p className="text-xs text-muted-foreground">Target: {dash.predicted_delivery.original_target}</p>
+          <p className="text-xs text-muted-foreground mt-auto">Target: {dash.predicted_delivery.original_target}</p>
         </div>
 
         {/* Activity */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+        <div className="rounded-lg border border-border bg-card p-4 flex flex-col min-h-[140px]">
           <h3 className="font-semibold text-sm text-foreground">Activity</h3>
-          <p className="text-3xl font-bold tabular-nums">{dash.brain_activity.count}</p>
-          <div className="h-1" />
-          <p className="text-xs text-muted-foreground">extractions this week</p>
+          <p className="text-4xl font-bold tabular-nums mt-2">{dash.brain_activity.count}</p>
+          <p className="text-xs text-muted-foreground mt-auto">extractions this week</p>
         </div>
       </div>
 
