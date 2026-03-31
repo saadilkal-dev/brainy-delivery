@@ -17,6 +17,22 @@ export const mockProjects: Project[] = [
     created_at: '2026-03-10T10:00:00Z',
     updated_at: '2026-03-25T10:00:00Z',
   },
+  {
+    id: 'proj-3',
+    name: 'HealthSync Patient Portal',
+    client_name: 'MediCorp',
+    target_date: '2026-07-20',
+    created_at: '2026-02-15T10:00:00Z',
+    updated_at: '2026-03-29T10:00:00Z',
+  },
+  {
+    id: 'proj-4',
+    name: 'EduTrack LMS Platform',
+    client_name: 'BrightLearn',
+    target_date: '2026-08-01',
+    created_at: '2026-03-05T10:00:00Z',
+    updated_at: '2026-03-30T10:00:00Z',
+  },
 ];
 
 export const mockModules: Module[] = [
