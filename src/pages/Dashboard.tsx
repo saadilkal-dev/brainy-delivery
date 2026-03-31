@@ -10,7 +10,7 @@ import { StatusBadge, getModuleStatusVariant, getExtractionTypeVariant, getSourc
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ShieldAlert, Calendar, Brain } from 'lucide-react';
 
