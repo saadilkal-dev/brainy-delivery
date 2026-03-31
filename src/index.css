@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    --font-sans: 'DM Sans', system-ui, sans-serif;
-    --font-heading: 'Syne', system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-heading: 'Inter', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
     --background: 216 33% 97%;
