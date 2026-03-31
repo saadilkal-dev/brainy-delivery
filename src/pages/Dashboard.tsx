@@ -249,11 +249,11 @@ export default function Dashboard() {
                     <AnimatePresence>
                       {isExpanded && (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                          className="overflow-hidden"
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute left-0 right-0 top-full z-30 rounded-b-sm border border-t-0 border-border bg-card shadow-xl"
                         >
                           <div className="border-t border-border p-4 space-y-2">
                             {mod.assumptions?.map(a => (
