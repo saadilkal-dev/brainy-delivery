@@ -88,7 +88,7 @@ export const mockModules: Module[] = [
     project_id: 'proj-1',
     name: 'Reporting Dashboard',
     description: 'Analytics and KPI dashboard for service managers',
-    owner: 'Dev C',
+    owner: 'Arjun',
     status: 'not_started',
     progress_pct: 0,
     estimated_hours: 60,
