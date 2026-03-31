@@ -4,13 +4,31 @@ interface ProgressBarProps {
   value: number;
   className?: string;
   barClassName?: string;
+  variant?: 'auto' | 'amber' | 'green' | 'red' | 'default';
+  blocked?: boolean;
 }
 
-export function ProgressBar({ value, className, barClassName }: ProgressBarProps) {
+function getBarColor(value: number, blocked: boolean): string {
+  if (blocked) return 'bg-destructive';
+  if (value >= 100) return 'bg-success';
+  if (value >= 80) return 'bg-success/70';
+  return 'bg-primary';
+}
+
+export function ProgressBar({ value, className, barClassName, variant = 'auto', blocked = false }: ProgressBarProps) {
+  const autoColor = getBarColor(value, blocked);
+
+  const barColor =
+    variant === 'amber'   ? 'bg-primary' :
+    variant === 'green'   ? 'bg-success' :
+    variant === 'red'     ? 'bg-destructive' :
+    variant === 'default' ? 'bg-primary' :
+    autoColor;
+
   return (
-    <div className={cn('h-2 w-full rounded-full bg-secondary', className)}>
+    <div className={cn('h-1.5 w-full bg-secondary/60', className)}>
       <div
-        className={cn('h-full rounded-full bg-primary transition-all duration-300', barClassName)}
+        className={cn('h-full transition-all duration-500 ease-out', barColor, barClassName)}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />
     </div>

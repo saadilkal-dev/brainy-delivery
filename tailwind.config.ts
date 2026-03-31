@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        heading: ["var(--font-heading)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -68,11 +70,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Command Center custom tokens
+        cyan: {
+          DEFAULT: "hsl(195 100% 50%)",
+          dim: "hsl(195 100% 50% / 0.12)",
+          border: "hsl(195 100% 50% / 0.3)",
+        },
+        amber: {
+          DEFAULT: "hsl(38 91% 55%)",
+          dim: "hsl(38 91% 55% / 0.12)",
+          border: "hsl(38 91% 55% / 0.3)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "2px",
       },
       keyframes: {
         "accordion-down": {
@@ -83,15 +96,30 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "pulse-brain": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.4" },
+        "amber-pulse": {
+          "0%, 100%": { opacity: "1", filter: "drop-shadow(0 0 4px hsl(38 91% 55% / 0.7))" },
+          "50%": { opacity: "0.65", filter: "drop-shadow(0 0 10px hsl(38 91% 55% / 1))" },
+        },
+        "status-glow": {
+          "0%, 100%": { boxShadow: "0 0 3px currentColor" },
+          "50%": { boxShadow: "0 0 8px currentColor, 0 0 12px currentColor" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-brain": "pulse-brain 1.5s ease-in-out infinite",
+        "amber-pulse": "amber-pulse 2.5s ease-in-out infinite",
+        "status-glow": "status-glow 2s ease-in-out infinite",
+        "slide-up": "slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in": "fade-in 0.4s ease-out forwards",
       },
     },
   },

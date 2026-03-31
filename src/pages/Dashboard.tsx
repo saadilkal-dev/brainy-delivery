@@ -11,24 +11,42 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, AlertTriangle, Activity, Calendar, Target, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ShieldAlert, Calendar, Brain } from 'lucide-react';
 
 function ProgressRing({ value, total, status }: { value: number; total: number; status: string }) {
   const pct = total > 0 ? (value / total) * 100 : 0;
-  const r = 18;
+  const r = 34;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (pct / 100) * circumference;
-  const color = status === 'on_track' ? 'hsl(var(--success))' : status === 'at_risk' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))';
+  const color =
+    status === 'on_track' ? 'hsl(var(--success))' :
+    status === 'at_risk'  ? 'hsl(var(--primary))' :
+                            'hsl(var(--destructive))';
 
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" className="shrink-0 -rotate-90">
-      <circle cx="24" cy="24" r={r} fill="none" stroke="hsl(var(--secondary))" strokeWidth="5" />
-      <circle cx="24" cy="24" r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round"
-        strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-500" />
+    <svg width="84" height="84" className="transform -rotate-90">
+      <circle cx="42" cy="42" r={r} fill="none" stroke="hsl(var(--secondary))" strokeWidth="5" />
+      <circle
+        cx="42" cy="42" r={r}
+        fill="none"
+        stroke={color}
+        strokeWidth="5"
+        strokeLinecap="butt"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        className="transition-all duration-700"
+      />
     </svg>
   );
 }
+
+const moduleStatusBorderColor: Record<string, string> = {
+  complete:    'border-l-success',
+  in_progress: 'border-l-primary',
+  blocked:     'border-l-destructive',
+  not_started: 'border-l-muted-foreground/20',
+};
 
 export default function Dashboard() {
   const { id } = useParams<{ id: string }>();
@@ -49,148 +67,231 @@ export default function Dashboard() {
 
   const dashQ = useQuery({ queryKey: ['dashboard', id], queryFn: () => getDashboard(id!), enabled: !!id });
   const modsQ = useQuery({ queryKey: ['modules', id], queryFn: () => getModules(id!), enabled: !!id });
-  const extQ = useQuery({ queryKey: ['extractions', id, 5], queryFn: () => getExtractions(id!, 5), enabled: !!id });
+  const extQ  = useQuery({ queryKey: ['extractions', id, 5], queryFn: () => getExtractions(id!, 5), enabled: !!id });
 
   if (dashQ.isLoading) return <LoadingSpinner />;
-  if (dashQ.isError) return <ErrorMessage message={dashQ.error.message} onRetry={() => dashQ.refetch()} />;
+  if (dashQ.isError)   return <ErrorMessage message={dashQ.error.message} onRetry={() => dashQ.refetch()} />;
 
   const dash = dashQ.data!;
   const modules = modsQ.data ?? [];
   const extractions = extQ.data ?? [];
 
-  const driftColor = dash.predicted_delivery.drift_days <= 0 ? 'text-success' : dash.predicted_delivery.drift_days <= 5 ? 'text-warning' : 'text-destructive';
+  const drift = dash.predicted_delivery.drift_days;
+  const driftLabel = drift === 0 ? 'On target' : drift > 0 ? `+${drift}d` : `${drift}d`;
+  const driftColor = drift <= 0 ? 'text-success' : drift <= 5 ? 'text-primary' : 'text-destructive';
 
   return (
-    <div className="space-y-6">
-      {/* Stats Tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Progress */}
-        <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between min-h-[140px]">
-          <div className="flex flex-col h-full">
-            <h3 className="font-semibold text-sm text-foreground">Progress</h3>
-            <p className="text-4xl font-bold tabular-nums text-foreground mt-2">
-              {dash.overall_progress.completed}
-              <span className="text-muted-foreground font-normal text-xl">/{dash.overall_progress.total}</span>
+    <div className="space-y-8">
+      {/* Section: Stats */}
+      <div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 mb-4">
+          Project Health
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Progress ring card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-sm border border-white/[0.07] bg-card p-5 flex items-center gap-4 border-t-2 border-t-primary/40"
+          >
+            <ProgressRing
+              value={dash.overall_progress.completed}
+              total={dash.overall_progress.total}
+              status={dash.overall_progress.status}
+            />
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-1">Progress</p>
+              <p className="font-mono text-2xl font-bold text-foreground">
+                {dash.overall_progress.completed}
+                <span className="text-muted-foreground/40 text-base">/{dash.overall_progress.total}</span>
+              </p>
+              <p className="font-mono text-[10px] text-muted-foreground/50">modules done</p>
+            </div>
+          </motion.div>
+
+          {/* Blockers card */}
+          <motion.button
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => navigate(`/projects/${id}/blockers`)}
+            className={cn(
+              'rounded-sm border border-white/[0.07] bg-card p-5 text-left border-t-2 transition-colors',
+              dash.active_blockers > 0
+                ? 'border-t-destructive/60 hover:border-destructive/40 red-glow'
+                : 'border-t-muted-foreground/20'
+            )}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldAlert className="h-3.5 w-3.5 text-destructive" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">Blockers</p>
+            </div>
+            <p className={cn('font-mono text-3xl font-bold', dash.active_blockers > 0 ? 'text-destructive' : 'text-foreground')}>
+              {dash.active_blockers}
             </p>
-            <p className="text-xs text-muted-foreground mt-auto">modules complete</p>
-          </div>
-          <div className="pt-1">
-            <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
-          </div>
-        </div>
+            <p className="font-mono text-[10px] text-muted-foreground/50 mt-1">active right now</p>
+          </motion.button>
 
-        {/* Blockers */}
-        <button
-          onClick={() => navigate(`/projects/${id}/blockers`)}
-          className="rounded-lg border border-border bg-card p-4 flex flex-col text-left hover:bg-accent transition-colors group cursor-pointer min-h-[140px]"
-        >
-          <h3 className="font-semibold text-sm text-foreground">Blockers</h3>
-          <p className="text-4xl font-bold text-destructive tabular-nums mt-2">{dash.active_blockers}</p>
-          <p className="text-xs text-muted-foreground group-hover:text-foreground/70 transition-colors mt-auto">View details →</p>
-        </button>
+          {/* Predicted delivery card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-sm border border-white/[0.07] bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar className="h-3.5 w-3.5 text-[hsl(195_100%_50%)]" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">Delivery</p>
+            </div>
+            <p className={cn('font-mono text-xl font-bold', driftColor)}>{dash.predicted_delivery.date}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={cn('font-mono text-xs font-bold', driftColor)}>{driftLabel}</span>
+              <span className="font-mono text-[10px] text-muted-foreground/40">vs target {dash.predicted_delivery.original_target}</span>
+            </div>
+          </motion.div>
 
-        {/* Delivery */}
-        <div className="rounded-lg border border-border bg-card p-4 flex flex-col min-h-[140px]">
-          <h3 className="font-semibold text-sm text-foreground">Delivery</h3>
-          <p className={cn('text-2xl font-bold tabular-nums whitespace-nowrap mt-2', driftColor)}>
-            {dash.predicted_delivery.date}
-          </p>
-          <p className="text-xs text-muted-foreground mt-auto">Target: {dash.predicted_delivery.original_target}</p>
-        </div>
-
-        {/* Activity */}
-        <div className="rounded-lg border border-border bg-card p-4 flex flex-col min-h-[140px]">
-          <h3 className="font-semibold text-sm text-foreground">Activity</h3>
-          <p className="text-4xl font-bold tabular-nums mt-2">{dash.brain_activity.count}</p>
-          <p className="text-xs text-muted-foreground mt-auto">extractions this week</p>
+          {/* Brain activity card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-sm border border-white/[0.07] bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Brain className="h-3.5 w-3.5 text-[hsl(195_100%_50%)]" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">Brain Activity</p>
+            </div>
+            <p className="font-mono text-3xl font-bold text-[hsl(195_100%_50%)]">{dash.brain_activity.count}</p>
+            <p className="font-mono text-[10px] text-muted-foreground/50 mt-1">extractions this week</p>
+          </motion.div>
         </div>
       </div>
 
-      {/* Module Grid */}
+      {/* Section: Modules */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Modules</h2>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 mb-4">
+          Module Status
+        </p>
         {modsQ.isLoading ? <LoadingSpinner /> : modules.length === 0 ? (
-          <EmptyState title="No modules yet" description="Go to the Plan page to create your first module." actionLabel="Go to Plan" onAction={() => navigate(`/projects/${id}/plan`)} />
+          <EmptyState
+            title="No modules yet"
+            description="Go to the Plan page to create your first module."
+            actionLabel="Go to Plan"
+            onAction={() => navigate(`/projects/${id}/plan`)}
+          />
         ) : (
-          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules.map(mod => {
-              const isExpanded = expandedModule === mod.id;
-              const hasExpanded = expandedModule !== null;
-              return (
-                <div
-                  data-module-card
-                  key={mod.id}
-                  className={cn(
-                    'rounded-lg border border-border bg-card overflow-visible relative transition-all duration-300',
-                    isExpanded ? 'z-20 ring-2 ring-primary/30 shadow-xl shadow-primary/10 scale-[1.02]' : '',
-                    hasExpanded && !isExpanded ? 'opacity-40 blur-[1px] pointer-events-none' : ''
-                  )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {modules.map((mod, i) => (
+              <motion.div
+                data-module-card
+                key={mod.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'rounded-sm border border-white/[0.07] bg-card overflow-hidden border-l-2',
+                  moduleStatusBorderColor[mod.status] || 'border-l-muted-foreground/20'
+                )}
+              >
+                <button
+                  onClick={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)}
+                  className="w-full p-4 text-left"
                 >
-                  <button onClick={() => setExpandedModule(isExpanded ? null : mod.id)} className="w-full h-full p-4 text-left">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-sm">{mod.name}</h3>
-                      <StatusBadge variant={getModuleStatusVariant(mod.status)}>{mod.status.replace('_', ' ')}</StatusBadge>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <h3 className="font-heading font-semibold text-sm text-foreground leading-snug">{mod.name}</h3>
+                    <StatusBadge variant={getModuleStatusVariant(mod.status)}>
+                      {mod.status.replace('_', ' ')}
+                    </StatusBadge>
+                  </div>
+                  {mod.owner && (
+                    <p className="font-mono text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-wider">{mod.owner}</p>
+                  )}
+                  <div className="flex items-center gap-2 mb-2">
+                    <ProgressBar
+                      value={mod.progress_pct}
+                      blocked={mod.status === 'blocked'}
+                      className="flex-1"
+                    />
+                    <span className="font-mono text-[10px] text-muted-foreground/60 shrink-0">{mod.progress_pct}%</span>
+                  </div>
+                  {mod.status === 'blocked' && mod.blocker_reason && (
+                    <p className="font-mono text-[10px] text-destructive/80 mt-1">⛔ {mod.blocker_reason}</p>
+                  )}
+                  {mod.assumptions && mod.assumptions.length > 0 && (
+                    <div className="mt-2">
+                      <StatusBadge variant="amber">⚠ {mod.assumptions.length} assumption{mod.assumptions.length > 1 ? 's' : ''}</StatusBadge>
                     </div>
-                    {mod.owner && <p className="text-xs text-muted-foreground mb-2">{mod.owner}</p>}
-                    <ProgressBar value={mod.progress_pct} className="mb-2" />
-                    {mod.status === 'blocked' && mod.blocker_reason && (
-                      <p className="text-xs text-destructive mt-1">⛔ {mod.blocker_reason}</p>
-                    )}
-                    {mod.assumptions && mod.assumptions.length > 0 && (
-                      <StatusBadge variant="amber" className="mt-1">⚠ {mod.assumptions.length} assumptions</StatusBadge>
-                    )}
-                    <ChevronDown className={cn('h-4 w-4 text-muted-foreground mt-2 transition-transform', isExpanded && 'rotate-180')} />
-                  </button>
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="absolute left-0 right-0 top-full mt-1 rounded-b-lg border border-border bg-card shadow-lg z-30"
-                      >
-                        <div className="p-4 space-y-2 text-sm">
-                          {mod.assumptions?.map(a => (
-                            <div key={a.id} className="flex items-start gap-3">
-                              <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'} className="shrink-0 mt-0.5 min-w-[80px] justify-center">{a.status}</StatusBadge>
-                              <span className="text-muted-foreground">{a.text}</span>
-                            </div>
-                          ))}
-                          {mod.dependencies?.map(d => (
-                            <div key={d.id} className="flex items-start gap-3">
-                              <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'} className="shrink-0 mt-0.5 min-w-[80px] justify-center">{d.status}</StatusBadge>
-                              <span className="text-muted-foreground">{d.description}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
+                  )}
+                  <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/40 mt-2 transition-transform', expandedModule === mod.id && 'rotate-180')} />
+                </button>
+
+                {expandedModule === mod.id && (
+                  <div className="border-t border-white/[0.06] p-4 space-y-2">
+                    {mod.assumptions?.map(a => (
+                      <div key={a.id} className="flex items-center gap-2">
+                        <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>
+                          {a.status}
+                        </StatusBadge>
+                        <span className="font-mono text-[10px] text-muted-foreground">{a.text}</span>
+                      </div>
+                    ))}
+                    {mod.dependencies?.map(d => (
+                      <div key={d.id} className="flex items-center gap-2">
+                        <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>
+                          {d.status}
+                        </StatusBadge>
+                        <span className="font-mono text-[10px] text-muted-foreground">{d.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Recent Brain Activity */}
+      {/* Section: Brain Activity */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Recent Brain Activity</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[hsl(195_100%_50%)] shadow-[0_0_6px_hsl(195_100%_50%/0.8)]" />
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50">
+            Recent Brain Activity
+          </p>
+        </div>
+
         {extQ.isLoading ? <LoadingSpinner /> : extractions.length === 0 ? (
-          <EmptyState title="No meeting transcripts processed yet" description="Go to Ingestion Feed to add one." actionLabel="Go to Ingestion" onAction={() => navigate(`/projects/${id}/ingestion`)} />
+          <EmptyState
+            title="No meeting transcripts processed yet"
+            description="Go to Ingestion Feed to add one."
+            actionLabel="Go to Ingestion"
+            onAction={() => navigate(`/projects/${id}/ingestion`)}
+          />
         ) : (
-          <div className="space-y-3">
-            {extractions.map(ext => (
-              <div key={ext.id} className="rounded-lg border border-border bg-card p-4">
+          <div className="space-y-2">
+            {extractions.map((ext, i) => (
+              <motion.div
+                key={ext.id}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="rounded-sm border border-[hsl(195_100%_50%/0.12)] bg-card p-4 border-l-2 border-l-[hsl(195_100%_50%/0.5)]"
+              >
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <StatusBadge variant={getSourceVariant(ext.source_type)}>{ext.source_type}</StatusBadge>
-                  <StatusBadge variant={getExtractionTypeVariant(ext.extraction_type)}>{ext.extraction_type.replace('_', ' ')}</StatusBadge>
-                  {ext.affected_module_name && <span className="text-xs text-muted-foreground">→ {ext.affected_module_name}</span>}
+                  <StatusBadge variant={getExtractionTypeVariant(ext.extraction_type)}>
+                    {ext.extraction_type.replace('_', ' ')}
+                  </StatusBadge>
+                  {ext.affected_module_name && (
+                    <span className="font-mono text-[10px] text-muted-foreground/50">→ {ext.affected_module_name}</span>
+                  )}
                 </div>
-                <p className="text-sm text-foreground">{ext.summary}</p>
-                <p className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(ext.created_at), { addSuffix: true })}</p>
-              </div>
+                <p className="text-sm text-foreground/90">{ext.summary}</p>
+                <p className="font-mono text-[10px] text-muted-foreground/40 mt-1.5">
+                  {formatDistanceToNow(new Date(ext.created_at), { addSuffix: true })}
+                </p>
+              </motion.div>
             ))}
           </div>
         )}
