@@ -62,7 +62,7 @@ export function AppSidebar() {
       {id && projects && projects.length > 0 && (
         <div className="px-3 py-3 border-b border-sidebar-border">
           <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Projects</p>
-          <div className="relative">
+          <div className="relative" ref={selectorRef}>
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
               className="w-full flex items-center justify-between rounded-sm bg-sidebar-accent px-3 py-2 text-xs font-mono text-foreground/80 transition-colors border border-sidebar-border hover:bg-sidebar-accent/80"
