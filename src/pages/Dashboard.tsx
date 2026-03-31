@@ -80,9 +80,9 @@ export default function Dashboard() {
         {/* Blockers */}
         <button
           onClick={() => navigate(`/projects/${id}/blockers`)}
-          className="rounded-lg border border-border bg-card p-6 space-y-4 text-left hover:bg-accent transition-colors group cursor-pointer"
+          className="rounded-lg border border-border bg-card p-4 space-y-4 text-left hover:bg-accent transition-colors group cursor-pointer"
         >
-          <h3 className="text-base font-bold text-foreground">Blockers</h3>
+          <h3 className="font-semibold text-sm text-foreground">Blockers</h3>
           <p className="text-3xl font-bold text-destructive tabular-nums">{dash.active_blockers}</p>
           <div className="h-1" />
           <p className="text-xs text-muted-foreground group-hover:text-foreground/70 transition-colors">View details →</p>
