@@ -48,7 +48,7 @@ export const mockModules: Module[] = [
     project_id: 'proj-1',
     name: 'User Onboarding Flow',
     description: 'Registration, login, and guided setup for new service technicians',
-    owner: 'Dev B',
+    owner: 'Priya',
     status: 'in_progress',
     progress_pct: 65,
     estimated_hours: 80,
