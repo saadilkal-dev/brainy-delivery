@@ -74,7 +74,7 @@ export default function Dashboard() {
             </p>
             <p className="text-xs text-muted-foreground mt-auto">modules complete</p>
           </div>
-          <div className="pt-1">
+          <div className="flex items-center">
             <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
           </div>
         </div>
