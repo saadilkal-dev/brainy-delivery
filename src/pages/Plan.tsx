@@ -68,26 +68,26 @@ export default function Plan() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative rounded-xl border border-primary/20 bg-primary/[0.04] p-5 violet-glow overflow-hidden"
+        className="rounded-sm border border-primary/20 bg-primary/[0.03] p-5"
       >
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent pointer-events-none" />
-        <div className="flex items-center gap-2.5 mb-3 relative">
-          <Brain className="h-4 w-4 text-primary animate-violet-pulse" />
+        <div className="flex items-center gap-2.5 mb-3">
+          <div className="relative">
+            <Brain className="h-4 w-4 text-primary animate-amber-pulse" />
+          </div>
           <h2 className="font-heading font-semibold text-foreground">AI Plan Generator</h2>
           <Sparkles className="h-3.5 w-3.5 text-primary/60" />
         </div>
-        <p className="text-sm text-muted-foreground/70 mb-4 relative">
-          Paste your estimation sheet or client brief — AI will propose modules and ask clarifying questions
+        <p className="font-mono text-[11px] text-muted-foreground/60 mb-4 uppercase tracking-wider">
+          Paste your estimation sheet or client brief — AI will propose modules + ask clarifying questions
         </p>
         <Textarea
           placeholder="Paste your estimation sheet or project brief here..."
-          className="mb-3 bg-secondary/60 border-primary/10 text-sm placeholder:text-muted-foreground/30 resize-none rounded-lg relative"
+          className="mb-3 bg-secondary/40 border-primary/10 font-mono text-sm placeholder:text-muted-foreground/20 resize-none"
           rows={4}
         />
         <Button
           onClick={() => toast.info('Connect your estimation sheet to unlock AI plan generation')}
-          className="relative rounded-lg"
+          className="font-mono text-xs uppercase tracking-wider"
         >
           Generate Modules →
         </Button>
@@ -104,14 +104,14 @@ export default function Plan() {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl border border-border bg-card overflow-hidden transition-all hover:border-border/60"
+              className="rounded-sm border border-border bg-card overflow-hidden"
             >
               <button
                 onClick={() => setExpanded(expanded === mod.id ? null : mod.id)}
-                className="w-full flex items-center gap-4 p-4 text-left group hover:bg-muted/10 transition-colors"
+                className="w-full flex items-center gap-4 p-4 text-left group hover:bg-accent/30 transition-colors"
               >
                 {/* Zero-padded order number */}
-                <span className="font-mono text-sm font-bold text-primary/50 shrink-0 w-8 text-right">
+                <span className="font-mono text-lg font-bold text-primary/40 shrink-0 w-8 text-right">
                   {String(mod.order).padStart(2, '0')}
                 </span>
 
@@ -145,19 +145,19 @@ export default function Plan() {
               {expanded === mod.id && (
                 <div className="border-t border-border">
                   {/* Tabs */}
-                  <div className="flex border-b border-border px-2 pt-1 gap-1">
+                  <div className="flex border-b border-border">
                     {['assumptions', 'dependencies', 'brain_updates'].map(tab => (
                       <button
                         key={tab}
                         onClick={() => setActiveTab(p => ({ ...p, [mod.id]: tab }))}
                         className={cn(
-                          'px-3 py-2 text-xs font-medium transition-colors rounded-t-md border-b-2 -mb-px',
+                          'px-4 py-2.5 font-mono text-[10px] uppercase tracking-wider transition-colors border-b-2',
                           getTab(mod.id) === tab
                             ? 'border-primary text-primary bg-primary/5'
                             : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
                         )}
                       >
-                        {tab === 'brain_updates' ? 'AI Updates' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === 'brain_updates' ? 'Brain' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                       </button>
                     ))}
                   </div>
@@ -334,7 +334,7 @@ export default function Plan() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-border rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl shadow-black/60"
+            className="bg-card border border-border rounded-sm p-6 w-full max-w-md space-y-4 shadow-2xl"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold text-foreground">Add Module</h3>
@@ -358,13 +358,13 @@ export default function Plan() {
               }}
               className="space-y-3"
             >
-              <Input name="name" placeholder="Module name" required className="bg-secondary/60 border-border font-mono text-sm" />
-              <Textarea name="description" placeholder="Description" className="bg-secondary/60 border-border font-mono text-sm resize-none" />
-              <Input name="owner" placeholder="Owner" className="bg-secondary/60 border-border font-mono text-sm" />
-              <Input name="estimated_hours" type="number" placeholder="Estimated hours" className="bg-secondary/60 border-border font-mono text-sm" />
+              <Input name="name" placeholder="Module name" required className="bg-secondary/60 font-mono text-sm" />
+              <Textarea name="description" placeholder="Description" className="bg-secondary/60 font-mono text-sm resize-none" />
+              <Input name="owner" placeholder="Owner" className="bg-secondary/60 font-mono text-sm" />
+              <Input name="estimated_hours" type="number" placeholder="Estimated hours" className="bg-secondary/60 font-mono text-sm" />
               <div className="grid grid-cols-2 gap-3">
-                <Input name="planned_start" type="date" className="bg-secondary/60 border-border font-mono text-sm" />
-                <Input name="planned_end" type="date" className="bg-secondary/60 border-border font-mono text-sm" />
+                <Input name="planned_start" type="date" className="bg-secondary/60 font-mono text-sm" />
+                <Input name="planned_end" type="date" className="bg-secondary/60 font-mono text-sm" />
               </div>
               <Button type="submit" disabled={createMod.isPending} className="w-full font-mono text-xs uppercase tracking-wider">
                 {createMod.isPending ? 'Creating...' : 'Create Module'}

@@ -10,7 +10,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="grain-overlay flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
+    <div className="dark grain-overlay flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
       {/* Red radial glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-destructive/[0.06] blur-[100px]" />

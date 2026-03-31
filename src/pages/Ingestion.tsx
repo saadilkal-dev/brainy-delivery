@@ -55,7 +55,7 @@ export default function Ingestion() {
       >
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Meeting Intelligence</h1>
-          <p className="text-sm text-muted-foreground/60 mt-1">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50 mt-1">
             Auto-synced from Google Chat ·{' '}
             {meetingsQ.data?.length
               ? `Updated ${formatDistanceToNow(new Date(meetingsQ.data[0].date), { addSuffix: true })}`
@@ -67,7 +67,7 @@ export default function Ingestion() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
           </span>
-          <span className="text-xs text-muted-foreground/50">Live</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50">Live</span>
         </div>
       </motion.div>
 
@@ -92,8 +92,8 @@ export default function Ingestion() {
             >
               {/* Date group header */}
               <div className="flex items-center gap-4 mb-5">
-                <p className="text-xs font-medium text-muted-foreground/60 shrink-0">{date}</p>
-                <div className="flex-1 h-px bg-muted/50" />
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 shrink-0">{date}</p>
+                <div className="flex-1 h-px bg-border" />
               </div>
 
               <div className="space-y-3">
@@ -120,15 +120,15 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className={`rounded-xl bg-card overflow-hidden card-shadow`}
+      className={`rounded-sm border border-border bg-card overflow-hidden border-l-2 ${mood.borderColor}`}
     >
       {/* Header */}
       <button
         onClick={() => setExpanded(v => !v)}
-        className="w-full text-left p-5 flex items-start gap-4 group hover:bg-muted/10 transition-colors"
+        className="w-full text-left p-5 flex items-start gap-4 group hover:bg-accent/30 transition-colors"
       >
         {/* Source icon */}
-        <div className="rounded-lg bg-muted/30 border border-border p-2 shrink-0 mt-0.5">
+        <div className="rounded-sm bg-secondary border border-border p-2 shrink-0 mt-0.5">
           <SourceIcon className={`h-4 w-4 ${mood.iconColor}`} />
         </div>
 
@@ -141,28 +141,28 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
             </div>
           </div>
 
-          <p className="text-sm text-muted-foreground/60 line-clamp-2 mb-3">{meeting.summary}</p>
+          <p className="font-mono text-xs text-muted-foreground/60 line-clamp-2 mb-3">{meeting.summary}</p>
 
           {/* Meta row */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground/50 flex-wrap">
-            <span className="flex items-center gap-1.5">
+          <div className="flex items-center gap-4 font-mono text-[10px] text-muted-foreground/40 flex-wrap">
+            <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {format(new Date(meeting.date), 'h:mm a')} · {meeting.duration_minutes}m
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
               {meeting.participants.length} participants
             </span>
             {meeting.blockers_identified.length > 0 && (
-              <span className="flex items-center gap-1.5 text-destructive/80">
+              <span className="flex items-center gap-1 text-destructive">
                 <AlertTriangle className="h-3 w-3" />
                 {meeting.blockers_identified.length} blocker{meeting.blockers_identified.length > 1 ? 's' : ''}
               </span>
             )}
             {meeting.action_items.length > 0 && (
-              <span className="flex items-center gap-1.5 text-primary/80">
+              <span className="flex items-center gap-1 text-primary">
                 <CheckCircle2 className="h-3 w-3" />
-                {meeting.action_items.length} action{meeting.action_items.length > 1 ? 's' : ''}
+                {meeting.action_items.length} action item{meeting.action_items.length > 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -250,7 +250,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="flex items-start gap-3 text-xs rounded-lg bg-muted/20 border border-border p-3"
+                        className="flex items-start gap-3 font-mono text-xs rounded-sm bg-secondary/50 border border-border p-3"
                       >
                         <div className="h-4 w-4 rounded-sm border border-muted-foreground/20 shrink-0 mt-0.5" />
                         <div className="flex-1">
@@ -276,7 +276,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="text-sm text-foreground/80 flex items-start gap-2 bg-destructive/5 rounded-lg p-3 border border-destructive/15"
+                        className="font-mono text-xs text-foreground/80 flex items-start gap-2 bg-destructive/5 rounded-sm p-3 border-l-2 border-l-destructive"
                       >
                         <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />
                         {b}
@@ -288,12 +288,12 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
 
               {/* Extractions */}
               {meeting.extractions.length > 0 && (
-                <Section icon={Brain} title="AI Extractions" iconColor="text-[hsl(175_85%_55%)]">
+                <Section icon={Brain} title="Brain Extractions" iconColor="text-[hsl(195_100%_50%)]">
                   <div className="space-y-2">
                     {meeting.extractions.map(ext => (
                       <div
                         key={ext.id}
-                        className="rounded-lg border border-[hsl(175_85%_55%/0.15)] bg-[hsl(175_85%_55%/0.04)] p-3"
+                        className="rounded-sm border border-[hsl(195_100%_50%/0.15)] bg-[hsl(195_100%_50%/0.03)] p-3 border-l-2 border-l-[hsl(195_100%_50%/0.4)]"
                       >
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <StatusBadge variant={getSourceVariant(ext.source_type)}>{ext.source_type}</StatusBadge>
@@ -303,7 +303,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
                         </div>
                         <p className="font-mono text-xs text-foreground/80">{ext.summary}</p>
                         {ext.source_quote && (
-                          <blockquote className="border-l-2 border-border/50 pl-3 font-mono text-[10px] text-muted-foreground/40 italic mt-2">
+                          <blockquote className="border-l-2 border-border pl-3 font-mono text-[10px] text-muted-foreground/40 italic mt-2">
                             "{ext.source_quote}"
                           </blockquote>
                         )}
@@ -325,7 +325,7 @@ function Section({ icon: Icon, title, iconColor, children }: { icon: any; title:
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Icon className={`h-3.5 w-3.5 ${iconColor}`} />
-        <h4 className="text-xs font-medium text-muted-foreground/70">{title}</h4>
+        <h4 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">{title}</h4>
       </div>
       {children}
     </div>

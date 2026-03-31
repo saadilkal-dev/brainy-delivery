@@ -26,9 +26,9 @@ export function ProgressBar({ value, className, barClassName, variant = 'auto', 
     autoColor;
 
   return (
-    <div className={cn('h-1.5 w-full bg-secondary/60 rounded-full overflow-hidden', className)}>
+    <div className={cn('h-1.5 w-full bg-secondary/60', className)}>
       <div
-        className={cn('h-full transition-all duration-500 ease-out rounded-full', barColor, barClassName)}
+        className={cn('h-full transition-all duration-500 ease-out', barColor, barClassName)}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />
     </div>

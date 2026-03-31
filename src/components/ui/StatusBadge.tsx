@@ -6,23 +6,34 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const badgeClasses: Record<StatusBadgeProps['variant'], string> = {
-  default: 'bg-muted/60 text-muted-foreground border-muted',
-  blue:    'bg-[hsl(175_85%_55%/0.1)] text-[hsl(175_85%_55%)] border-[hsl(175_85%_55%/0.25)]',
-  red:     'bg-destructive/10 text-destructive border-destructive/25',
-  green:   'bg-success/10 text-success border-success/25',
-  amber:   'bg-warning/10 text-warning border-warning/25',
-  purple:  'bg-primary/10 text-primary border-primary/25',
-  grey:    'bg-muted/40 text-muted-foreground/60 border-muted/50',
+const dotClasses: Record<StatusBadgeProps['variant'], string> = {
+  default: 'bg-muted-foreground',
+  blue:    'bg-[hsl(195_100%_50%)] shadow-[0_0_6px_hsl(195_100%_50%/0.8)]',
+  red:     'bg-destructive shadow-[0_0_8px_hsl(0_72%_51%/0.9)]',
+  green:   'bg-success shadow-[0_0_6px_hsl(158_64%_42%/0.8)]',
+  amber:   'bg-primary shadow-[0_0_6px_hsl(38_91%_55%/0.8)]',
+  purple:  'bg-purple-400 shadow-[0_0_6px_hsl(270_60%_70%/0.7)]',
+  grey:    'bg-muted-foreground/40',
+};
+
+const textClasses: Record<StatusBadgeProps['variant'], string> = {
+  default: 'text-muted-foreground',
+  blue:    'text-[hsl(195_100%_50%)]',
+  red:     'text-destructive',
+  green:   'text-success',
+  amber:   'text-primary',
+  purple:  'text-purple-400',
+  grey:    'text-muted-foreground/70',
 };
 
 export function StatusBadge({ variant, children, className }: StatusBadgeProps) {
   return (
     <span className={cn(
-      'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-xs font-medium',
-      badgeClasses[variant],
+      'inline-flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-wider',
+      textClasses[variant],
       className
     )}>
+      <span className={cn('inline-block h-1.5 w-1.5 shrink-0 rounded-full', dotClasses[variant])} />
       {children}
     </span>
   );
@@ -31,7 +42,7 @@ export function StatusBadge({ variant, children, className }: StatusBadgeProps) 
 export function getModuleStatusVariant(status: string): StatusBadgeProps['variant'] {
   switch (status) {
     case 'complete':    return 'green';
-    case 'in_progress': return 'purple';
+    case 'in_progress': return 'amber';
     case 'blocked':     return 'red';
     default:            return 'grey';
   }

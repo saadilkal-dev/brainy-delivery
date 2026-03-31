@@ -37,19 +37,21 @@ export default function Projects() {
 
   return (
     <div className="grain-overlay min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-      {/* Ambient background glows */}
+      {/* Ambient radial gradient */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary/[0.07] blur-[140px]" />
-        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-[hsl(175_85%_55%/0.04)] blur-[100px]" />
-        <div className="absolute bottom-1/4 left-1/4 w-[200px] h-[200px] rounded-full bg-primary/[0.05] blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.06] blur-[120px]" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-[hsl(195_100%_50%/0.04)] blur-[80px]" />
       </div>
 
-      {/* Subtle dot grid pattern */}
+      {/* Subtle grid pattern */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.035]"
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
         style={{
-          backgroundImage: `radial-gradient(hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
+          backgroundImage: `
+            linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
         }}
       />
 
@@ -65,11 +67,11 @@ export default function Projects() {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex justify-center mb-6"
+            className="flex justify-center mb-5"
           >
             <div className="relative">
-              <div className="absolute inset-0 blur-3xl bg-primary/40 rounded-full scale-[2] opacity-60" />
-              <div className="relative p-4 rounded-2xl bg-primary/10 border border-primary/20 violet-glow">
+              <div className="absolute inset-0 blur-2xl bg-primary/30 rounded-full scale-150" />
+              <div className="relative p-4 rounded-2xl bg-card border border-primary/20">
                 <Brain className="h-10 w-10 text-primary" />
               </div>
             </div>
@@ -83,7 +85,7 @@ export default function Projects() {
             <h1 className="font-heading text-4xl font-bold tracking-tight text-foreground mb-2">
               Delivery Brain
             </h1>
-            <p className="text-sm text-muted-foreground/70">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground/60">
               Mission control for software delivery
             </p>
           </motion.div>
@@ -94,10 +96,12 @@ export default function Projects() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-card/70 backdrop-blur-sm border border-border rounded-2xl p-7 space-y-5 violet-glow"
+          className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-7 space-y-5"
         >
           <div>
-            <p className="text-xs text-muted-foreground/60 mb-1">New Project</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60 mb-1">
+              New Project
+            </p>
             <h2 className="font-heading text-lg font-semibold text-foreground">Create your first project</h2>
           </div>
 
@@ -114,42 +118,42 @@ export default function Projects() {
             className="space-y-4"
           >
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground/80">
+              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
                 Project Name
               </label>
               <Input
                 name="name"
                 required
                 placeholder="Daikin Selection Tool"
-                className="bg-secondary/60 border-border text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 font-mono text-sm placeholder:text-muted-foreground/30"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground/80">
+              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
                 Client Name
               </label>
               <Input
                 name="client_name"
                 required
                 placeholder="Daikin"
-                className="bg-secondary/60 border-border text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 font-mono text-sm placeholder:text-muted-foreground/30"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground/80">
+              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
                 Target Delivery Date
               </label>
               <Input
                 name="target_date"
                 type="date"
                 required
-                className="bg-secondary/60 border-border text-sm rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 font-mono text-sm"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full font-semibold tracking-wide mt-2 rounded-lg bg-primary hover:bg-primary/90 violet-glow"
+              className="w-full font-heading font-semibold tracking-wide mt-2"
               disabled={createMut.isPending}
             >
               {createMut.isPending ? 'Initialising...' : 'Launch Project →'}
@@ -157,7 +161,7 @@ export default function Projects() {
           </form>
         </motion.div>
 
-        <p className="text-center text-xs text-muted-foreground/30 mt-6 tracking-widest uppercase">
+        <p className="text-center font-mono text-[10px] text-muted-foreground/30 mt-6 uppercase tracking-widest">
           HumAIn PDLC · Softway
         </p>
       </motion.div>
