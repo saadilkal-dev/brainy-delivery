@@ -107,7 +107,7 @@ export const mockModules: Module[] = [
     project_id: 'proj-1',
     name: 'Notifications System',
     description: 'Email and push notifications for service updates',
-    owner: 'Dev B',
+    owner: 'Priya',
     status: 'complete',
     progress_pct: 100,
     estimated_hours: 40,
