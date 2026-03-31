@@ -93,7 +93,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-sm border border-white/[0.07] bg-card p-5 flex items-center gap-4 border-t-2 border-t-primary/40"
+            className="rounded-sm border border-border bg-card p-5 flex items-center gap-4 border-t-2 border-t-primary/40"
           >
             <ProgressRing
               value={dash.overall_progress.completed}
@@ -117,9 +117,9 @@ export default function Dashboard() {
             transition={{ delay: 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => navigate(`/projects/${id}/blockers`)}
             className={cn(
-              'rounded-sm border border-white/[0.07] bg-card p-5 text-left border-t-2 transition-colors',
+              'rounded-sm border border-border bg-card p-5 text-left border-t-2 transition-colors',
               dash.active_blockers > 0
-                ? 'border-t-destructive/60 hover:border-destructive/40 red-glow'
+                ? 'border-t-destructive/60 hover:border-destructive/40'
                 : 'border-t-muted-foreground/20'
             )}
           >
@@ -138,7 +138,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-sm border border-white/[0.07] bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
+            className="rounded-sm border border-border bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
           >
             <div className="flex items-center gap-2 mb-3">
               <Calendar className="h-3.5 w-3.5 text-[hsl(195_100%_50%)]" />
@@ -156,7 +156,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-sm border border-white/[0.07] bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
+            className="rounded-sm border border-border bg-card p-5 border-t-2 border-t-[hsl(195_100%_50%/0.3)]"
           >
             <div className="flex items-center gap-2 mb-3">
               <Brain className="h-3.5 w-3.5 text-[hsl(195_100%_50%)]" />
@@ -190,7 +190,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
-                  'rounded-sm border border-white/[0.07] bg-card overflow-hidden border-l-2',
+                  'rounded-sm border border-border bg-card overflow-hidden border-l-2',
                   moduleStatusBorderColor[mod.status] || 'border-l-muted-foreground/20'
                 )}
               >
@@ -227,7 +227,7 @@ export default function Dashboard() {
                 </button>
 
                 {expandedModule === mod.id && (
-                  <div className="border-t border-white/[0.06] p-4 space-y-2">
+                  <div className="border-t border-border p-4 space-y-2">
                     {mod.assumptions?.map(a => (
                       <div key={a.id} className="flex items-center gap-2">
                         <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>

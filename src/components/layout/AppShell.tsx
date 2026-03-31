@@ -8,7 +8,7 @@ export function AppShell() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex w-full dark grain-overlay">
+    <div className="min-h-screen flex w-full grain-overlay">
       <AppSidebar />
       <div className="flex-1 flex flex-col md:ml-60">
         <TopBar />

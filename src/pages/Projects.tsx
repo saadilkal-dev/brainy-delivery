@@ -36,7 +36,7 @@ export default function Projects() {
   if (projectsQ.isError) return <ErrorMessage message={projectsQ.error.message} onRetry={() => projectsQ.refetch()} />;
 
   return (
-    <div className="dark grain-overlay min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="grain-overlay min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
       {/* Ambient radial gradient */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.06] blur-[120px]" />
@@ -71,7 +71,7 @@ export default function Projects() {
           >
             <div className="relative">
               <div className="absolute inset-0 blur-2xl bg-primary/30 rounded-full scale-150" />
-              <div className="relative p-4 rounded-2xl bg-card border border-primary/20 amber-glow">
+              <div className="relative p-4 rounded-2xl bg-card border border-primary/20">
                 <Brain className="h-10 w-10 text-primary" />
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function Projects() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-card/80 backdrop-blur-sm border border-white/[0.07] rounded-lg p-7 space-y-5"
+          className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-7 space-y-5"
         >
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60 mb-1">
@@ -125,7 +125,7 @@ export default function Projects() {
                 name="name"
                 required
                 placeholder="Daikin Selection Tool"
-                className="bg-secondary/60 border-white/[0.08] font-mono text-sm placeholder:text-muted-foreground/30"
+                className="bg-secondary/60 font-mono text-sm placeholder:text-muted-foreground/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -136,7 +136,7 @@ export default function Projects() {
                 name="client_name"
                 required
                 placeholder="Daikin"
-                className="bg-secondary/60 border-white/[0.08] font-mono text-sm placeholder:text-muted-foreground/30"
+                className="bg-secondary/60 font-mono text-sm placeholder:text-muted-foreground/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -147,13 +147,13 @@ export default function Projects() {
                 name="target_date"
                 type="date"
                 required
-                className="bg-secondary/60 border-white/[0.08] font-mono text-sm"
+                className="bg-secondary/60 font-mono text-sm"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full font-heading font-semibold tracking-wide amber-glow mt-2"
+              className="w-full font-heading font-semibold tracking-wide mt-2"
               disabled={createMut.isPending}
             >
               {createMut.isPending ? 'Initialising...' : 'Launch Project →'}
