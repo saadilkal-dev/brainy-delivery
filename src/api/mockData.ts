@@ -69,7 +69,7 @@ export const mockModules: Module[] = [
     project_id: 'proj-1',
     name: 'Service Request Module',
     description: 'Technician service request submission and tracking',
-    owner: 'Dev A',
+    owner: 'Ravi',
     status: 'not_started',
     progress_pct: 0,
     estimated_hours: 100,
