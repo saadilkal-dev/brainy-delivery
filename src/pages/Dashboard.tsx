@@ -65,19 +65,16 @@ export default function Dashboard() {
       {/* Stats Tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Progress */}
-        <div className="rounded-2xl bg-primary/10 p-6 space-y-4">
-          <h3 className="text-base font-bold text-primary">Progress</h3>
-          <p className="text-3xl font-bold tabular-nums text-foreground">
-            {dash.overall_progress.completed}
-            <span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span>
-          </p>
-          <div className="flex items-center gap-3">
-            <ProgressBar value={Math.round((dash.overall_progress.completed / dash.overall_progress.total) * 100)} className="flex-1" />
-            <span className="text-xs font-medium text-muted-foreground tabular-nums">
-              {Math.round((dash.overall_progress.completed / dash.overall_progress.total) * 100)}%
-            </span>
+        <div className="rounded-2xl bg-primary/10 p-6 flex items-center justify-between">
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-primary">Progress</h3>
+            <p className="text-3xl font-bold tabular-nums text-foreground">
+              {dash.overall_progress.completed}
+              <span className="text-muted-foreground font-normal text-lg">/{dash.overall_progress.total}</span>
+            </p>
+            <p className="text-xs text-muted-foreground">modules complete</p>
           </div>
-          <p className="text-xs text-muted-foreground">modules complete</p>
+          <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
         </div>
 
         {/* Blockers */}
