@@ -70,11 +70,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Command Center custom tokens
+        // Semantic accent tokens
+        violet: {
+          DEFAULT: "hsl(265 85% 70%)",
+          dim: "hsl(265 85% 70% / 0.1)",
+          border: "hsl(265 85% 70% / 0.25)",
+        },
         cyan: {
-          DEFAULT: "hsl(195 100% 50%)",
-          dim: "hsl(195 100% 50% / 0.12)",
-          border: "hsl(195 100% 50% / 0.3)",
+          DEFAULT: "hsl(175 85% 55%)",
+          dim: "hsl(175 85% 55% / 0.12)",
+          border: "hsl(175 85% 55% / 0.3)",
         },
         amber: {
           DEFAULT: "hsl(38 91% 55%)",
@@ -85,7 +90,7 @@ export default {
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
-        sm: "2px",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         "accordion-down": {
@@ -95,6 +100,10 @@ export default {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
+        },
+        "violet-pulse": {
+          "0%, 100%": { opacity: "1", filter: "drop-shadow(0 0 4px hsl(265 85% 70% / 0.7))" },
+          "50%": { opacity: "0.6", filter: "drop-shadow(0 0 12px hsl(265 85% 70% / 1))" },
         },
         "amber-pulse": {
           "0%, 100%": { opacity: "1", filter: "drop-shadow(0 0 4px hsl(38 91% 55% / 0.7))" },
@@ -112,10 +121,14 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        ping: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "violet-pulse": "violet-pulse 2.5s ease-in-out infinite",
         "amber-pulse": "amber-pulse 2.5s ease-in-out infinite",
         "status-glow": "status-glow 2s ease-in-out infinite",
         "slide-up": "slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",

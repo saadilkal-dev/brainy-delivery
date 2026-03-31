@@ -29,17 +29,19 @@ export function AppSidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Wordmark */}
-      <div className="px-5 py-5 border-b border-white/[0.07]">
+      <div className="px-5 py-5 border-b border-white/[0.06]">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="relative">
-            <Brain className="h-5 w-5 text-primary" />
-            <div className="absolute inset-0 blur-sm bg-primary/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 blur-xl bg-primary/50 rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative p-1.5 rounded-lg bg-primary/10 border border-primary/20">
+              <Brain className="h-4 w-4 text-primary" />
+            </div>
           </div>
           <div className="leading-none">
-            <div className="font-heading text-[11px] font-semibold tracking-[0.18em] uppercase text-muted-foreground/70">
-              DELIVERY
+            <div className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/50">
+              Delivery
             </div>
-            <div className="font-heading text-base font-bold tracking-tight text-foreground">
+            <div className="font-heading text-sm font-bold tracking-tight text-foreground">
               Brain
             </div>
           </div>
@@ -48,17 +50,17 @@ export function AppSidebar() {
 
       {/* Project selector */}
       {id && projects && projects.length > 0 && (
-        <div className="px-3 py-3 border-b border-white/[0.07]">
+        <div className="px-3 py-3 border-b border-white/[0.06]">
           <div className="relative">
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
-              className="w-full flex items-center justify-between rounded-sm bg-white/[0.04] hover:bg-white/[0.07] px-3 py-2 text-xs font-mono text-foreground/80 transition-colors border border-white/[0.06]"
+              className="w-full flex items-center justify-between rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-3 py-2 text-xs text-foreground/80 transition-colors border border-white/[0.06]"
             >
-              <span className="truncate">{currentProject?.name || 'Select project'}</span>
+              <span className="truncate font-medium">{currentProject?.name || 'Select project'}</span>
               <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground transition-transform shrink-0 ml-2', selectorOpen && 'rotate-180')} />
             </button>
             {selectorOpen && (
-              <div className="absolute z-50 mt-1 w-full rounded-sm border border-white/[0.1] bg-popover shadow-xl shadow-black/40 backdrop-blur-sm">
+              <div className="absolute z-50 mt-1 w-full rounded-lg border border-white/[0.1] bg-popover shadow-xl shadow-black/50 backdrop-blur-sm overflow-hidden">
                 {projects.map(p => (
                   <button
                     key={p.id}
@@ -68,8 +70,8 @@ export function AppSidebar() {
                       setMobileOpen(false);
                     }}
                     className={cn(
-                      'w-full text-left px-3 py-2.5 text-xs font-mono transition-colors hover:bg-white/[0.05]',
-                      p.id === id ? 'text-primary bg-primary/5' : 'text-foreground/70'
+                      'w-full text-left px-3 py-2.5 text-xs transition-colors hover:bg-white/[0.05]',
+                      p.id === id ? 'text-primary bg-primary/5 font-medium' : 'text-foreground/70'
                     )}
                   >
                     {p.name}
@@ -92,22 +94,25 @@ export function AppSidebar() {
               to={to}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 text-[13px] font-mono transition-all relative',
+                'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all relative',
                 active
-                  ? 'text-primary border-l-2 border-primary bg-primary/[0.06] pl-[10px]'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03] border-l-2 border-transparent pl-[10px]'
+                  ? 'text-primary bg-primary/10 font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
               )}
             >
-              <item.icon className={cn('h-3.5 w-3.5 shrink-0', active ? 'text-primary' : 'text-muted-foreground')} />
+              {active && (
+                <div className="absolute left-0 inset-y-2 w-0.5 rounded-full bg-primary" />
+              )}
+              <item.icon className={cn('h-4 w-4 shrink-0', active ? 'text-primary' : 'text-muted-foreground')} />
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer hint */}
-      <div className="px-5 py-4 border-t border-white/[0.07]">
-        <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+      {/* Footer */}
+      <div className="px-5 py-4 border-t border-white/[0.06]">
+        <p className="text-[10px] text-muted-foreground/35 uppercase tracking-widest">
           HumAIn PDLC v1
         </p>
       </div>
@@ -119,7 +124,7 @@ export function AppSidebar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-3 left-3 z-50 md:hidden rounded-sm bg-card/80 backdrop-blur-sm p-2 text-foreground border border-white/[0.08]"
+        className="fixed top-3 left-3 z-50 md:hidden rounded-lg bg-card/80 backdrop-blur-sm p-2 text-foreground border border-white/[0.08]"
       >
         <Menu className="h-4 w-4" />
       </button>

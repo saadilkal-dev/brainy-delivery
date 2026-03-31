@@ -8,9 +8,14 @@ export function AppShell() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex w-full dark grain-overlay">
+    <div className="min-h-screen flex w-full dark grain-overlay relative">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/[0.04] blur-[120px]" />
+        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[hsl(175_85%_55%/0.03)] blur-[100px]" />
+      </div>
       <AppSidebar />
-      <div className="flex-1 flex flex-col md:ml-60">
+      <div className="flex-1 flex flex-col md:ml-60 relative">
         <TopBar />
         <main className="flex-1 overflow-auto p-6">
           <AnimatePresence mode="wait">

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,109 +6,109 @@
 
 @layer base {
   :root {
-    --font-sans: 'DM Sans', system-ui, sans-serif;
-    --font-heading: 'Syne', system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-    --background: 216 33% 97%;
-    --foreground: 222 47% 11%;
+    --background: 250 14% 97%;
+    --foreground: 240 10% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 10% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 240 10% 12%;
 
-    --primary: 38 91% 55%;
-    --primary-foreground: 222 47% 5%;
+    --primary: 265 89% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 216 20% 93%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 250 10% 93%;
+    --secondary-foreground: 240 10% 12%;
 
-    --muted: 216 20% 93%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 250 10% 93%;
+    --muted-foreground: 240 5% 50%;
 
-    --accent: 38 91% 55%;
-    --accent-foreground: 222 47% 5%;
+    --accent: 265 89% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 158 64% 42%;
+    --success: 160 68% 42%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 91% 55%;
-    --warning-foreground: 222 47% 5%;
+    --warning-foreground: 240 10% 4%;
 
-    --border: 216 20% 88%;
-    --input: 216 20% 88%;
-    --ring: 38 91% 55%;
+    --border: 250 10% 88%;
+    --input: 250 10% 88%;
+    --ring: 265 89% 60%;
 
-    --radius: 0.375rem;
+    --radius: 0.625rem;
 
-    --sidebar-background: 216 20% 95%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 38 91% 55%;
-    --sidebar-primary-foreground: 222 47% 5%;
-    --sidebar-accent: 216 20% 90%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 216 20% 88%;
-    --sidebar-ring: 38 91% 55%;
+    --sidebar-background: 250 10% 95%;
+    --sidebar-foreground: 240 10% 12%;
+    --sidebar-primary: 265 89% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 10% 90%;
+    --sidebar-accent-foreground: 240 10% 12%;
+    --sidebar-border: 250 10% 88%;
+    --sidebar-ring: 265 89% 60%;
   }
 
   .dark {
-    /* Deep space blue-black — the Command Center base */
-    --background: 222 47% 5%;
-    --foreground: 210 30% 93%;
+    /* AI product dark — deep near-black with violet undertone */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 93%;
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 30% 93%;
+    --card: 240 8% 6.5%;
+    --card-foreground: 0 0% 93%;
 
-    --popover: 222 40% 10%;
-    --popover-foreground: 210 30% 93%;
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 93%;
 
-    /* Electric amber — authority accent */
-    --primary: 38 91% 55%;
-    --primary-foreground: 222 47% 5%;
+    /* Electric violet — AI primary */
+    --primary: 265 85% 70%;
+    --primary-foreground: 240 10% 4%;
 
-    --secondary: 222 35% 13%;
-    --secondary-foreground: 210 20% 75%;
+    --secondary: 240 6% 11%;
+    --secondary-foreground: 0 0% 65%;
 
-    --muted: 222 35% 13%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 240 6% 11%;
+    --muted-foreground: 240 5% 48%;
 
-    --accent: 38 91% 55%;
-    --accent-foreground: 222 47% 5%;
+    --accent: 265 85% 70%;
+    --accent-foreground: 240 10% 4%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 68% 56%;
     --destructive-foreground: 0 0% 98%;
 
-    --success: 158 64% 42%;
+    --success: 160 68% 48%;
     --success-foreground: 0 0% 98%;
 
     --warning: 38 91% 55%;
-    --warning-foreground: 222 47% 5%;
+    --warning-foreground: 240 10% 4%;
 
-    /* Thin luminous border */
-    --border: 222 30% 16%;
-    --input: 222 30% 16%;
-    --ring: 38 91% 55%;
+    /* Barely-there borders */
+    --border: 240 5% 13%;
+    --input: 240 5% 13%;
+    --ring: 265 85% 70%;
 
-    --radius: 0.375rem;
+    --radius: 0.625rem;
 
     /* Sidebar — slightly darker than card */
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 30% 88%;
-    --sidebar-primary: 38 91% 55%;
-    --sidebar-primary-foreground: 222 47% 5%;
-    --sidebar-accent: 222 35% 12%;
-    --sidebar-accent-foreground: 210 30% 88%;
-    --sidebar-border: 222 30% 14%;
-    --sidebar-ring: 38 91% 55%;
+    --sidebar-background: 240 10% 3%;
+    --sidebar-foreground: 0 0% 88%;
+    --sidebar-primary: 265 85% 70%;
+    --sidebar-primary-foreground: 240 10% 4%;
+    --sidebar-accent: 240 6% 8%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 240 5% 10%;
+    --sidebar-ring: 265 85% 70%;
 
-    /* Command Center extra tokens */
-    --cyan: 195 100% 50%;
-    --grain-opacity: 0.035;
+    /* Extra tokens */
+    --cyan: 175 85% 55%;
+    --grain-opacity: 0.025;
   }
 
   * {
@@ -124,7 +124,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 }
 
@@ -139,10 +139,10 @@
   }
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--border));
-    border-radius: 2px;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.5);
+    background: hsl(var(--primary) / 0.4);
   }
 }
 
@@ -154,7 +154,7 @@
     inset: 0;
     pointer-events: none;
     z-index: 999;
-    opacity: var(--grain-opacity, 0.035);
+    opacity: var(--grain-opacity, 0.025);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 128px 128px;
@@ -163,19 +163,27 @@
 
 /* ─── Glow Utilities ───────────────────────────────────────── */
 @layer utilities {
-  .amber-glow {
-    box-shadow: 0 0 0 1px hsl(38 91% 55% / 0.25),
-                0 0 16px hsl(38 91% 55% / 0.1);
+  .violet-glow {
+    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.2),
+                0 0 24px hsl(265 85% 70% / 0.12),
+                0 8px 32px rgba(0, 0, 0, 0.3);
   }
-  .amber-glow-text {
-    text-shadow: 0 0 20px hsl(38 91% 55% / 0.4);
+  .violet-glow-sm {
+    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.15),
+                0 0 12px hsl(265 85% 70% / 0.08);
+  }
+  /* Keep for backward compat */
+  .amber-glow {
+    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.2),
+                0 0 24px hsl(265 85% 70% / 0.12);
   }
   .red-glow {
-    box-shadow: 0 0 0 1px hsl(0 72% 51% / 0.25),
-                0 0 20px hsl(0 72% 51% / 0.12);
+    box-shadow: 0 0 0 1px hsl(0 68% 56% / 0.2),
+                0 0 20px hsl(0 68% 56% / 0.1),
+                0 8px 32px rgba(0, 0, 0, 0.3);
   }
   .cyan-glow {
-    box-shadow: 0 0 0 1px hsl(195 100% 50% / 0.25),
-                0 0 16px hsl(195 100% 50% / 0.1);
+    box-shadow: 0 0 0 1px hsl(175 85% 55% / 0.2),
+                0 0 16px hsl(175 85% 55% / 0.1);
   }
 }

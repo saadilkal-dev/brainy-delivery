@@ -70,18 +70,19 @@ export default function Blockers() {
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="rounded-sm border border-destructive/20 bg-card p-5 space-y-4 border-l-4 border-l-destructive red-glow"
+                className="relative rounded-xl border border-destructive/20 bg-card p-5 space-y-4 overflow-hidden red-glow"
               >
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-destructive/60 to-transparent" />
                 <div className="flex items-center gap-3">
-                  <h3 className="font-heading text-lg font-bold text-destructive">{b.module_name}</h3>
+                  <h3 className="font-heading text-base font-semibold text-destructive">{b.module_name}</h3>
                   <StatusBadge variant="red">Blocked</StatusBadge>
                 </div>
 
                 {b.blocker_reason && (
-                  <p className="font-mono text-xs text-foreground/70">{b.blocker_reason}</p>
+                  <p className="text-sm text-foreground/70">{b.blocker_reason}</p>
                 )}
 
-                <div className="flex items-center gap-4 font-mono text-[10px] text-muted-foreground/40">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground/50">
                   {b.blocked_since && (
                     <span>Blocked since {b.blocked_since}</span>
                   )}
@@ -91,9 +92,9 @@ export default function Blockers() {
                 </div>
 
                 {b.overdue_dependencies.length > 0 && (
-                  <div className="space-y-2 pl-4 border-l-2 border-destructive/30">
+                  <div className="space-y-2">
                     {b.overdue_dependencies.map(d => (
-                      <div key={d.id} className="rounded-sm border border-destructive/15 bg-destructive/[0.03] p-3 space-y-2">
+                      <div key={d.id} className="rounded-xl border border-destructive/15 bg-destructive/[0.03] p-4 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <StatusBadge variant="red">Overdue</StatusBadge>
                           <StatusBadge variant={d.type === 'client' ? 'purple' : d.type === 'third_party' ? 'blue' : 'grey'}>
@@ -101,19 +102,19 @@ export default function Blockers() {
                           </StatusBadge>
                           <span className="font-mono text-[10px] text-muted-foreground/50">{d.owner}</span>
                         </div>
-                        <p className="font-mono text-xs text-foreground/80">{d.description}</p>
-                        <div className="flex items-center justify-between">
+                        <p className="text-sm text-foreground/80">{d.description}</p>
+                        <div className="flex items-center justify-between flex-wrap gap-2">
                           <div>
-                            <p className="font-mono text-[10px] text-muted-foreground/40">Expected: {d.expected_date}</p>
+                            <p className="text-xs text-muted-foreground/50">Expected: {d.expected_date}</p>
                             {d.days_overdue && d.days_overdue > 0 && (
-                              <p className="font-mono text-lg font-bold text-destructive leading-tight">+{d.days_overdue}d overdue</p>
+                              <p className="font-mono text-base font-bold text-destructive leading-tight mt-0.5">+{d.days_overdue}d overdue</p>
                             )}
                           </div>
                           <Button
                             size="sm"
                             onClick={() => genNudge.mutate(d.id)}
                             disabled={genNudge.isPending}
-                            className="font-mono text-[10px] uppercase tracking-wider h-7 bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 hover:text-primary"
+                            className="text-xs h-8 bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 hover:text-primary rounded-lg"
                             variant="ghost"
                           >
                             {genNudge.isPending ? 'Generating...' : 'Generate Nudge →'}
@@ -141,10 +142,10 @@ export default function Blockers() {
         ) : (
           <div className="space-y-2">
             {nudges.map(n => (
-              <div key={n.id} className="rounded-sm border border-white/[0.07] bg-card p-4 flex items-center justify-between gap-4">
+              <div key={n.id} className="rounded-xl border border-white/[0.07] bg-card p-4 flex items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="font-mono text-xs text-foreground/80 truncate">{n.dependency_description}</p>
-                  <p className="font-mono text-[10px] text-muted-foreground/40 mt-0.5">
+                  <p className="text-sm text-foreground/80 truncate">{n.dependency_description}</p>
+                  <p className="text-xs text-muted-foreground/50 mt-0.5">
                     To: {n.recipient} · {format(new Date(n.created_at), 'MMM d, yyyy')}
                   </p>
                 </div>
@@ -170,11 +171,11 @@ export default function Blockers() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-white/[0.08] rounded-sm p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/40"
+            className="bg-card border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Brain className="h-4 w-4 text-[hsl(195_100%_50%)]" />
+                <Brain className="h-4 w-4 text-primary" />
                 <h3 className="font-heading font-semibold text-foreground">Generated Nudge Email</h3>
               </div>
               <button onClick={() => setNudgeModal(null)} className="text-muted-foreground/40 hover:text-muted-foreground transition-colors">
@@ -182,23 +183,23 @@ export default function Blockers() {
               </button>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50">Subject</label>
-              <p className="font-mono text-sm text-foreground/90 bg-secondary/40 border border-white/[0.06] rounded-sm px-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground/60">Subject</label>
+              <p className="text-sm text-foreground/90 bg-secondary/40 border border-white/[0.06] rounded-lg px-3 py-2">
                 {nudgeModal.subject}
               </p>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50">Body</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground/60">Body</label>
               <Textarea
                 value={editBody}
                 onChange={e => setEditBody(e.target.value)}
-                className="bg-secondary/40 border-white/[0.06] font-mono text-xs min-h-[150px] resize-none"
+                className="bg-secondary/40 border-white/[0.06] text-sm min-h-[150px] resize-none rounded-lg"
               />
             </div>
 
-            <p className="font-mono text-[10px] text-muted-foreground/30 italic">
+            <p className="text-xs text-muted-foreground/40 italic">
               Copy and send manually — direct email delivery coming in v2
             </p>
 
@@ -206,13 +207,13 @@ export default function Blockers() {
               <Button
                 onClick={() => sendNudgeMut.mutate(nudgeModal.id)}
                 disabled={sendNudgeMut.isPending}
-                className="font-mono text-xs uppercase tracking-wider"
+                className="text-sm rounded-lg"
               >
                 Mark as Sent
               </Button>
               <Button
                 variant="outline"
-                className="font-mono text-xs uppercase tracking-wider"
+                className="text-sm rounded-lg"
                 onClick={() => {
                   navigator.clipboard.writeText(`Subject: ${nudgeModal.subject}\n\n${editBody}`);
                   toast.success('Copied to clipboard');
@@ -232,7 +233,7 @@ export default function Blockers() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-white/[0.08] rounded-sm p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/40"
+            className="bg-card border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold text-foreground">Nudge Details</h3>
@@ -240,15 +241,15 @@ export default function Blockers() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50">Subject</label>
-              <p className="font-mono text-sm text-foreground/90">{viewNudge.subject}</p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground/60">Subject</label>
+              <p className="text-sm text-foreground/90">{viewNudge.subject}</p>
             </div>
-            <div className="space-y-1">
-              <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/50">Body</label>
-              <p className="font-mono text-xs text-muted-foreground/70 whitespace-pre-wrap leading-relaxed">{viewNudge.body}</p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground/60">Body</label>
+              <p className="text-sm text-muted-foreground/70 whitespace-pre-wrap leading-relaxed">{viewNudge.body}</p>
             </div>
-            <Button variant="outline" className="font-mono text-xs uppercase tracking-wider" onClick={() => setViewNudge(null)}>
+            <Button variant="outline" className="text-sm rounded-lg" onClick={() => setViewNudge(null)}>
               Close
             </Button>
           </motion.div>
