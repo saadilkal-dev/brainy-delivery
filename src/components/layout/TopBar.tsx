@@ -25,7 +25,7 @@ export function TopBar() {
   const blockerCount = dashboard?.active_blockers ?? 0;
 
   return (
-    <header className="h-12 border-b border-white/[0.07] flex items-center justify-between px-6 bg-card/30 backdrop-blur-md sticky top-0 z-30">
+    <header className="h-12 border-b border-border flex items-center justify-between px-6 bg-background/85 backdrop-blur-sm border-b border-border sticky top-0 z-30">
       <div className="flex items-center gap-2.5 md:pl-0 pl-10">
         {/* Live pulse dot */}
         <span className="relative flex h-1.5 w-1.5 shrink-0">

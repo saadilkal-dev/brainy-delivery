@@ -36,7 +36,7 @@ export default function Projects() {
   if (projectsQ.isError) return <ErrorMessage message={projectsQ.error.message} onRetry={() => projectsQ.refetch()} />;
 
   return (
-    <div className="dark grain-overlay min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="grain-overlay min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
       {/* Ambient background glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary/[0.07] blur-[140px]" />
@@ -94,7 +94,7 @@ export default function Projects() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-card/70 backdrop-blur-sm border border-white/[0.08] rounded-2xl p-7 space-y-5 violet-glow"
+          className="bg-card/70 backdrop-blur-sm border border-border rounded-2xl p-7 space-y-5 violet-glow"
         >
           <div>
             <p className="text-xs text-muted-foreground/60 mb-1">New Project</p>
@@ -121,7 +121,7 @@ export default function Projects() {
                 name="name"
                 required
                 placeholder="Daikin Selection Tool"
-                className="bg-secondary/60 border-white/[0.08] text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 border-border text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
               />
             </div>
             <div className="space-y-1.5">
@@ -132,7 +132,7 @@ export default function Projects() {
                 name="client_name"
                 required
                 placeholder="Daikin"
-                className="bg-secondary/60 border-white/[0.08] text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 border-border text-sm placeholder:text-muted-foreground/30 rounded-lg focus-visible:ring-primary/40"
               />
             </div>
             <div className="space-y-1.5">
@@ -143,7 +143,7 @@ export default function Projects() {
                 name="target_date"
                 type="date"
                 required
-                className="bg-secondary/60 border-white/[0.08] text-sm rounded-lg focus-visible:ring-primary/40"
+                className="bg-secondary/60 border-border text-sm rounded-lg focus-visible:ring-primary/40"
               />
             </div>
 

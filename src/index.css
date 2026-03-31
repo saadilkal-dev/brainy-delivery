@@ -10,105 +10,58 @@
     --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-    --background: 250 14% 97%;
-    --foreground: 240 10% 12%;
+    /* Light mode — clean AI product */
+    --background: 250 30% 98%;
+    --foreground: 240 15% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 12%;
+    --card-foreground: 240 15% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 12%;
+    --popover-foreground: 240 15% 10%;
 
-    --primary: 265 89% 60%;
+    /* Electric violet — the AI accent */
+    --primary: 265 85% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 250 10% 93%;
-    --secondary-foreground: 240 10% 12%;
+    --secondary: 250 20% 95%;
+    --secondary-foreground: 240 10% 30%;
 
-    --muted: 250 10% 93%;
-    --muted-foreground: 240 5% 50%;
+    --muted: 250 20% 95%;
+    --muted-foreground: 240 8% 50%;
 
-    --accent: 265 89% 60%;
+    --accent: 265 85% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 68% 42%;
+    --success: 160 68% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 91% 55%;
-    --warning-foreground: 240 10% 4%;
+    --warning: 38 91% 50%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 250 10% 88%;
-    --input: 250 10% 88%;
-    --ring: 265 89% 60%;
+    /* Subtle visible borders */
+    --border: 250 15% 88%;
+    --input: 250 15% 88%;
+    --ring: 265 85% 60%;
 
     --radius: 0.625rem;
 
-    --sidebar-background: 250 10% 95%;
-    --sidebar-foreground: 240 10% 12%;
-    --sidebar-primary: 265 89% 60%;
+    /* Sidebar — slightly off-white */
+    --sidebar-background: 250 25% 97%;
+    --sidebar-foreground: 240 15% 10%;
+    --sidebar-primary: 265 85% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 10% 90%;
-    --sidebar-accent-foreground: 240 10% 12%;
-    --sidebar-border: 250 10% 88%;
-    --sidebar-ring: 265 89% 60%;
-  }
-
-  .dark {
-    /* AI product dark — deep near-black with violet undertone */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 93%;
-
-    --card: 240 8% 6.5%;
-    --card-foreground: 0 0% 93%;
-
-    --popover: 240 8% 8%;
-    --popover-foreground: 0 0% 93%;
-
-    /* Electric violet — AI primary */
-    --primary: 265 85% 70%;
-    --primary-foreground: 240 10% 4%;
-
-    --secondary: 240 6% 11%;
-    --secondary-foreground: 0 0% 65%;
-
-    --muted: 240 6% 11%;
-    --muted-foreground: 240 5% 48%;
-
-    --accent: 265 85% 70%;
-    --accent-foreground: 240 10% 4%;
-
-    --destructive: 0 68% 56%;
-    --destructive-foreground: 0 0% 98%;
-
-    --success: 160 68% 48%;
-    --success-foreground: 0 0% 98%;
-
-    --warning: 38 91% 55%;
-    --warning-foreground: 240 10% 4%;
-
-    /* Barely-there borders */
-    --border: 240 5% 13%;
-    --input: 240 5% 13%;
-    --ring: 265 85% 70%;
-
-    --radius: 0.625rem;
-
-    /* Sidebar — slightly darker than card */
-    --sidebar-background: 240 10% 3%;
-    --sidebar-foreground: 0 0% 88%;
-    --sidebar-primary: 265 85% 70%;
-    --sidebar-primary-foreground: 240 10% 4%;
-    --sidebar-accent: 240 6% 8%;
-    --sidebar-accent-foreground: 0 0% 88%;
-    --sidebar-border: 240 5% 10%;
-    --sidebar-ring: 265 85% 70%;
+    --sidebar-accent: 250 20% 93%;
+    --sidebar-accent-foreground: 240 15% 10%;
+    --sidebar-border: 250 15% 90%;
+    --sidebar-ring: 265 85% 60%;
 
     /* Extra tokens */
-    --cyan: 175 85% 55%;
-    --grain-opacity: 0.025;
+    --cyan: 175 85% 40%;
+    --grain-opacity: 0.018;
   }
 
   * {
@@ -154,36 +107,40 @@
     inset: 0;
     pointer-events: none;
     z-index: 999;
-    opacity: var(--grain-opacity, 0.025);
+    opacity: var(--grain-opacity, 0.018);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 128px 128px;
   }
 }
 
-/* ─── Glow Utilities ───────────────────────────────────────── */
+/* ─── Glow / Shadow Utilities ──────────────────────────────── */
 @layer utilities {
   .violet-glow {
-    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.2),
-                0 0 24px hsl(265 85% 70% / 0.12),
-                0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 1px hsl(265 85% 60% / 0.15),
+                0 4px 24px hsl(265 85% 60% / 0.12),
+                0 1px 4px rgba(0, 0, 0, 0.06);
   }
   .violet-glow-sm {
-    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.15),
-                0 0 12px hsl(265 85% 70% / 0.08);
+    box-shadow: 0 0 0 1px hsl(265 85% 60% / 0.12),
+                0 2px 12px hsl(265 85% 60% / 0.08);
   }
-  /* Keep for backward compat */
   .amber-glow {
-    box-shadow: 0 0 0 1px hsl(265 85% 70% / 0.2),
-                0 0 24px hsl(265 85% 70% / 0.12);
+    box-shadow: 0 0 0 1px hsl(265 85% 60% / 0.15),
+                0 4px 24px hsl(265 85% 60% / 0.12);
   }
   .red-glow {
-    box-shadow: 0 0 0 1px hsl(0 68% 56% / 0.2),
-                0 0 20px hsl(0 68% 56% / 0.1),
-                0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 1px hsl(0 72% 52% / 0.15),
+                0 4px 20px hsl(0 72% 52% / 0.08),
+                0 1px 4px rgba(0, 0, 0, 0.05);
   }
   .cyan-glow {
-    box-shadow: 0 0 0 1px hsl(175 85% 55% / 0.2),
-                0 0 16px hsl(175 85% 55% / 0.1);
+    box-shadow: 0 0 0 1px hsl(175 85% 40% / 0.15),
+                0 4px 16px hsl(175 85% 40% / 0.08);
+  }
+  .card-shadow {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04),
+                0 4px 12px rgba(0, 0, 0, 0.04),
+                0 0 0 1px hsl(var(--border));
   }
 }

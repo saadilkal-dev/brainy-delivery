@@ -104,11 +104,11 @@ export default function Plan() {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl border border-white/[0.07] bg-card overflow-hidden transition-all hover:border-white/[0.12]"
+              className="rounded-xl border border-border bg-card overflow-hidden transition-all hover:border-border/60"
             >
               <button
                 onClick={() => setExpanded(expanded === mod.id ? null : mod.id)}
-                className="w-full flex items-center gap-4 p-4 text-left group hover:bg-white/[0.02] transition-colors"
+                className="w-full flex items-center gap-4 p-4 text-left group hover:bg-muted/10 transition-colors"
               >
                 {/* Zero-padded order number */}
                 <span className="font-mono text-sm font-bold text-primary/50 shrink-0 w-8 text-right">
@@ -143,9 +143,9 @@ export default function Plan() {
               </button>
 
               {expanded === mod.id && (
-                <div className="border-t border-white/[0.06]">
+                <div className="border-t border-border">
                   {/* Tabs */}
-                  <div className="flex border-b border-white/[0.06] px-2 pt-1 gap-1">
+                  <div className="flex border-b border-border px-2 pt-1 gap-1">
                     {['assumptions', 'dependencies', 'brain_updates'].map(tab => (
                       <button
                         key={tab}
@@ -212,10 +212,10 @@ export default function Plan() {
                               const fd = new FormData(e.currentTarget);
                               addAssump.mutate({ moduleId: mod.id, data: { text: fd.get('text') as string, risk_level: fd.get('risk_level') as string } });
                             }}
-                            className="space-y-2 rounded-sm border border-white/[0.08] p-3"
+                            className="space-y-2 rounded-sm border border-border p-3"
                           >
                             <Input name="text" placeholder="Assumption text" required className="bg-secondary/60 font-mono text-xs" />
-                            <select name="risk_level" className="w-full rounded-sm border border-white/[0.08] bg-secondary/60 px-3 py-2 font-mono text-xs text-foreground" defaultValue="medium">
+                            <select name="risk_level" className="w-full rounded-sm border border-border bg-secondary/60 px-3 py-2 font-mono text-xs text-foreground" defaultValue="medium">
                               <option value="low">Low</option>
                               <option value="medium">Medium</option>
                               <option value="high">High</option>
@@ -243,7 +243,7 @@ export default function Plan() {
                             key={d.id}
                             className={cn(
                               'rounded-sm border p-3',
-                              d.status === 'overdue' ? 'border-destructive/30 border-l-2 border-l-destructive' : 'border-white/[0.07]'
+                              d.status === 'overdue' ? 'border-destructive/30 border-l-2 border-l-destructive' : 'border-border'
                             )}
                           >
                             <div className="flex items-center gap-2 flex-wrap mb-1.5">
@@ -265,11 +265,11 @@ export default function Plan() {
                               const fd = new FormData(e.currentTarget);
                               addDepMut.mutate({ moduleId: mod.id, data: { description: fd.get('description'), owner: fd.get('owner'), type: fd.get('type'), expected_date: fd.get('expected_date') } });
                             }}
-                            className="space-y-2 rounded-sm border border-white/[0.08] p-3"
+                            className="space-y-2 rounded-sm border border-border p-3"
                           >
                             <Input name="description" placeholder="Description" required className="bg-secondary/60 font-mono text-xs" />
                             <Input name="owner" placeholder="Owner" required className="bg-secondary/60 font-mono text-xs" />
-                            <select name="type" className="w-full rounded-sm border border-white/[0.08] bg-secondary/60 px-3 py-2 font-mono text-xs text-foreground">
+                            <select name="type" className="w-full rounded-sm border border-border bg-secondary/60 px-3 py-2 font-mono text-xs text-foreground">
                               <option value="client">Client</option>
                               <option value="internal">Internal</option>
                               <option value="third_party">Third-party</option>
@@ -334,7 +334,7 @@ export default function Plan() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-white/[0.08] rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl shadow-black/60"
+            className="bg-card border border-border rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl shadow-black/60"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold text-foreground">Add Module</h3>
@@ -358,13 +358,13 @@ export default function Plan() {
               }}
               className="space-y-3"
             >
-              <Input name="name" placeholder="Module name" required className="bg-secondary/60 border-white/[0.08] font-mono text-sm" />
-              <Textarea name="description" placeholder="Description" className="bg-secondary/60 border-white/[0.08] font-mono text-sm resize-none" />
-              <Input name="owner" placeholder="Owner" className="bg-secondary/60 border-white/[0.08] font-mono text-sm" />
-              <Input name="estimated_hours" type="number" placeholder="Estimated hours" className="bg-secondary/60 border-white/[0.08] font-mono text-sm" />
+              <Input name="name" placeholder="Module name" required className="bg-secondary/60 border-border font-mono text-sm" />
+              <Textarea name="description" placeholder="Description" className="bg-secondary/60 border-border font-mono text-sm resize-none" />
+              <Input name="owner" placeholder="Owner" className="bg-secondary/60 border-border font-mono text-sm" />
+              <Input name="estimated_hours" type="number" placeholder="Estimated hours" className="bg-secondary/60 border-border font-mono text-sm" />
               <div className="grid grid-cols-2 gap-3">
-                <Input name="planned_start" type="date" className="bg-secondary/60 border-white/[0.08] font-mono text-sm" />
-                <Input name="planned_end" type="date" className="bg-secondary/60 border-white/[0.08] font-mono text-sm" />
+                <Input name="planned_start" type="date" className="bg-secondary/60 border-border font-mono text-sm" />
+                <Input name="planned_end" type="date" className="bg-secondary/60 border-border font-mono text-sm" />
               </div>
               <Button type="submit" disabled={createMod.isPending} className="w-full font-mono text-xs uppercase tracking-wider">
                 {createMod.isPending ? 'Creating...' : 'Create Module'}

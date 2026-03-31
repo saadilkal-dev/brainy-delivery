@@ -70,7 +70,7 @@ export default function Blockers() {
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-xl border border-destructive/20 bg-card p-5 space-y-4 overflow-hidden red-glow"
+                className="relative rounded-xl bg-card p-5 space-y-4 overflow-hidden red-glow"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-destructive/60 to-transparent" />
                 <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export default function Blockers() {
         ) : (
           <div className="space-y-2">
             {nudges.map(n => (
-              <div key={n.id} className="rounded-xl border border-white/[0.07] bg-card p-4 flex items-center justify-between gap-4">
+              <div key={n.id} className="rounded-xl bg-card p-4 flex items-center justify-between gap-4 card-shadow">
                 <div className="min-w-0">
                   <p className="text-sm text-foreground/80 truncate">{n.dependency_description}</p>
                   <p className="text-xs text-muted-foreground/50 mt-0.5">
@@ -171,7 +171,7 @@ export default function Blockers() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
+            className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export default function Blockers() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground/60">Subject</label>
-              <p className="text-sm text-foreground/90 bg-secondary/40 border border-white/[0.06] rounded-lg px-3 py-2">
+              <p className="text-sm text-foreground/90 bg-secondary/40 border border-border rounded-lg px-3 py-2">
                 {nudgeModal.subject}
               </p>
             </div>
@@ -195,7 +195,7 @@ export default function Blockers() {
               <Textarea
                 value={editBody}
                 onChange={e => setEditBody(e.target.value)}
-                className="bg-secondary/40 border-white/[0.06] text-sm min-h-[150px] resize-none rounded-lg"
+                className="bg-secondary/40 border-border text-sm min-h-[150px] resize-none rounded-lg"
               />
             </div>
 
@@ -233,7 +233,7 @@ export default function Blockers() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-card border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
+            className="bg-card border border-border rounded-2xl p-6 w-full max-w-lg space-y-5 shadow-2xl shadow-black/60"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-heading font-semibold text-foreground">Nudge Details</h3>

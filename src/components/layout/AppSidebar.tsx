@@ -29,7 +29,7 @@ export function AppSidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Wordmark */}
-      <div className="px-5 py-5 border-b border-white/[0.06]">
+      <div className="px-5 py-5 border-b border-border">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="relative">
             <div className="absolute inset-0 blur-xl bg-primary/50 rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -50,17 +50,17 @@ export function AppSidebar() {
 
       {/* Project selector */}
       {id && projects && projects.length > 0 && (
-        <div className="px-3 py-3 border-b border-white/[0.06]">
+        <div className="px-3 py-3 border-b border-border">
           <div className="relative">
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
-              className="w-full flex items-center justify-between rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-3 py-2 text-xs text-foreground/80 transition-colors border border-white/[0.06]"
+              className="w-full flex items-center justify-between rounded-lg bg-muted/30 hover:bg-muted/50 px-3 py-2 text-xs text-foreground/80 transition-colors border border-border"
             >
               <span className="truncate font-medium">{currentProject?.name || 'Select project'}</span>
               <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground transition-transform shrink-0 ml-2', selectorOpen && 'rotate-180')} />
             </button>
             {selectorOpen && (
-              <div className="absolute z-50 mt-1 w-full rounded-lg border border-white/[0.1] bg-popover shadow-xl shadow-black/50 backdrop-blur-sm overflow-hidden">
+              <div className="absolute z-50 mt-1 w-full rounded-lg border border-border/50 bg-popover shadow-xl shadow-black/50 backdrop-blur-sm overflow-hidden">
                 {projects.map(p => (
                   <button
                     key={p.id}
@@ -70,7 +70,7 @@ export function AppSidebar() {
                       setMobileOpen(false);
                     }}
                     className={cn(
-                      'w-full text-left px-3 py-2.5 text-xs transition-colors hover:bg-white/[0.05]',
+                      'w-full text-left px-3 py-2.5 text-xs transition-colors hover:bg-muted/40',
                       p.id === id ? 'text-primary bg-primary/5 font-medium' : 'text-foreground/70'
                     )}
                   >
@@ -97,7 +97,7 @@ export function AppSidebar() {
                 'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all relative',
                 active
                   ? 'text-primary bg-primary/10 font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
               )}
             >
               {active && (
@@ -111,7 +111,7 @@ export function AppSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-white/[0.06]">
+      <div className="px-5 py-4 border-t border-border">
         <p className="text-[10px] text-muted-foreground/35 uppercase tracking-widest">
           HumAIn PDLC v1
         </p>
@@ -124,7 +124,7 @@ export function AppSidebar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-3 left-3 z-50 md:hidden rounded-lg bg-card/80 backdrop-blur-sm p-2 text-foreground border border-white/[0.08]"
+        className="fixed top-3 left-3 z-50 md:hidden rounded-lg bg-card/80 backdrop-blur-sm p-2 text-foreground border border-border"
       >
         <Menu className="h-4 w-4" />
       </button>
@@ -133,7 +133,7 @@ export function AppSidebar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-60 h-full bg-sidebar border-r border-white/[0.07]">
+          <div className="relative w-60 h-full bg-sidebar border-r border-border">
             <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
@@ -143,7 +143,7 @@ export function AppSidebar() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-white/[0.07]">
+      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-border">
         {sidebarContent}
       </aside>
     </>

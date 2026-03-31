@@ -46,7 +46,7 @@ const moduleStatusConfig: Record<string, { bg: string; dot: string }> = {
   complete:    { bg: 'bg-success/5 border-success/20',    dot: 'bg-success shadow-[0_0_6px_hsl(160_68%_48%/0.8)]' },
   in_progress: { bg: 'bg-primary/5 border-primary/20',    dot: 'bg-primary shadow-[0_0_6px_hsl(265_85%_70%/0.8)]' },
   blocked:     { bg: 'bg-destructive/5 border-destructive/20', dot: 'bg-destructive shadow-[0_0_6px_hsl(0_68%_56%/0.8)]' },
-  not_started: { bg: 'border-white/[0.07]',               dot: 'bg-muted-foreground/30' },
+  not_started: { bg: 'border-border',               dot: 'bg-muted-foreground/30' },
 };
 
 export default function Dashboard() {
@@ -93,7 +93,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative rounded-xl border border-white/[0.07] bg-card p-5 flex items-center gap-4 overflow-hidden"
+            className="relative rounded-xl bg-card p-5 flex items-center gap-4 overflow-hidden card-shadow"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] to-transparent pointer-events-none" />
@@ -119,10 +119,10 @@ export default function Dashboard() {
             transition={{ delay: 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => navigate(`/projects/${id}/blockers`)}
             className={cn(
-              'relative rounded-xl border bg-card p-5 text-left overflow-hidden transition-all group',
+              'relative rounded-xl bg-card p-5 text-left overflow-hidden transition-all group card-shadow',
               dash.active_blockers > 0
                 ? 'border-destructive/20 hover:border-destructive/40 red-glow'
-                : 'border-white/[0.07] hover:border-white/[0.14]'
+                : 'border-border hover:border-border/70'
             )}
           >
             {dash.active_blockers > 0 && (
@@ -147,7 +147,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative rounded-xl border border-white/[0.07] bg-card p-5 overflow-hidden"
+            className="relative rounded-xl bg-card p-5 overflow-hidden card-shadow"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[hsl(175_85%_55%/0.6)] to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-br from-[hsl(175_85%_55%/0.04)] to-transparent pointer-events-none" />
@@ -167,7 +167,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative rounded-xl border border-white/[0.07] bg-card p-5 overflow-hidden"
+            className="relative rounded-xl bg-card p-5 overflow-hidden card-shadow"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] to-transparent pointer-events-none" />
@@ -203,7 +203,7 @@ export default function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   className={cn(
-                    'rounded-xl border bg-card overflow-hidden transition-all',
+                    'rounded-xl bg-card overflow-hidden transition-all card-shadow',
                     config.bg
                   )}
                 >
@@ -251,7 +251,7 @@ export default function Dashboard() {
                         transition={{ duration: 0.2, ease: 'easeInOut' }}
                         className="overflow-hidden"
                       >
-                        <div className="border-t border-white/[0.06] p-4 space-y-2">
+                        <div className="border-t border-border p-4 space-y-2">
                           {mod.assumptions?.map(a => (
                             <div key={a.id} className="flex items-center gap-2">
                               <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-xl border border-[hsl(175_85%_55%/0.15)] bg-card p-4 overflow-hidden"
+                className="relative rounded-xl bg-card p-4 overflow-hidden card-shadow border border-[hsl(175_85%_55%/0.2)]"
               >
                 <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-[hsl(175_85%_55%/0.6)] to-transparent" />
                 <div className="flex items-center gap-2 mb-2 flex-wrap">

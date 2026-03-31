@@ -8,7 +8,7 @@ export function AppShell() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex w-full dark grain-overlay relative">
+    <div className="min-h-screen flex w-full grain-overlay relative">
       {/* Ambient background glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/[0.04] blur-[120px]" />
