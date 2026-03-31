@@ -49,6 +49,7 @@ export function AppSidebar() {
       {/* Project selector */}
       {id && projects && projects.length > 0 && (
         <div className="px-3 py-3 border-b border-white/[0.07]">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Projects</p>
           <div className="relative">
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
