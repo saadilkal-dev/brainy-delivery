@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { Brain, LayoutDashboard, ListChecks, Rss, ShieldAlert, ChevronDown, Menu, X } from 'lucide-react';
 import { getProjects } from '@/api/projects';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: 'dashboard' },
@@ -18,6 +18,18 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const selectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectorOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (selectorRef.current && !selectorRef.current.contains(e.target as Node)) {
+        setSelectorOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [selectorOpen]);
 
   const { data: projects } = useQuery({
     queryKey: ['projects'],
@@ -50,7 +62,7 @@ export function AppSidebar() {
       {id && projects && projects.length > 0 && (
         <div className="px-3 py-3 border-b border-sidebar-border">
           <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Projects</p>
-          <div className="relative">
+          <div className="relative" ref={selectorRef}>
             <button
               onClick={() => setSelectorOpen(!selectorOpen)}
               className="w-full flex items-center justify-between rounded-sm bg-sidebar-accent px-3 py-2 text-xs font-mono text-foreground/80 transition-colors border border-sidebar-border hover:bg-sidebar-accent/80"
