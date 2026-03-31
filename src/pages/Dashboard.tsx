@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge, getModuleStatusVariant, getExtractionTypeVariant, getSourceVariant } from '@/components/ui/StatusBadge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, AlertTriangle, Activity, Calendar, Target, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
