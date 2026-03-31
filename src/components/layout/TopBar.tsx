@@ -50,6 +50,7 @@ export function TopBar() {
             {blockerCount} blocker{blockerCount > 1 ? 's' : ''}
           </button>
         )}
+        <ThemeToggle />
         <div className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider hidden sm:block">
           {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </div>
