@@ -93,7 +93,7 @@ export default function Ingestion() {
               {/* Date group header */}
               <div className="flex items-center gap-4 mb-5">
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 shrink-0">{date}</p>
-                <div className="flex-1 h-px bg-white/[0.05]" />
+                <div className="flex-1 h-px bg-border" />
               </div>
 
               <div className="space-y-3">
@@ -120,15 +120,15 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className={`rounded-sm border border-white/[0.07] bg-card overflow-hidden border-l-2 ${mood.borderColor}`}
+      className={`rounded-sm border border-border bg-card overflow-hidden border-l-2 ${mood.borderColor}`}
     >
       {/* Header */}
       <button
         onClick={() => setExpanded(v => !v)}
-        className="w-full text-left p-5 flex items-start gap-4 group hover:bg-white/[0.02] transition-colors"
+        className="w-full text-left p-5 flex items-start gap-4 group hover:bg-accent/30 transition-colors"
       >
         {/* Source icon */}
-        <div className="rounded-sm bg-white/[0.04] border border-white/[0.06] p-2 shrink-0 mt-0.5">
+        <div className="rounded-sm bg-secondary border border-border p-2 shrink-0 mt-0.5">
           <SourceIcon className={`h-4 w-4 ${mood.iconColor}`} />
         </div>
 
@@ -201,7 +201,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 space-y-5 border-t border-white/[0.06] pt-4">
+            <div className="px-5 pb-5 space-y-5 border-t border-border pt-4">
               {/* Key Points */}
               <Section icon={Lightbulb} title="Key Points" iconColor="text-primary">
                 <ul className="space-y-2">
@@ -250,7 +250,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="flex items-start gap-3 font-mono text-xs rounded-sm bg-white/[0.03] border border-white/[0.05] p-3"
+                        className="flex items-start gap-3 font-mono text-xs rounded-sm bg-secondary/50 border border-border p-3"
                       >
                         <div className="h-4 w-4 rounded-sm border border-muted-foreground/20 shrink-0 mt-0.5" />
                         <div className="flex-1">
@@ -303,7 +303,7 @@ function MeetingCard({ meeting, index }: { meeting: Meeting; index: number }) {
                         </div>
                         <p className="font-mono text-xs text-foreground/80">{ext.summary}</p>
                         {ext.source_quote && (
-                          <blockquote className="border-l-2 border-white/[0.1] pl-3 font-mono text-[10px] text-muted-foreground/40 italic mt-2">
+                          <blockquote className="border-l-2 border-border pl-3 font-mono text-[10px] text-muted-foreground/40 italic mt-2">
                             "{ext.source_quote}"
                           </blockquote>
                         )}
