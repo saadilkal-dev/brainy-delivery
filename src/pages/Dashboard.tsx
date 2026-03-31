@@ -65,7 +65,7 @@ export default function Dashboard() {
       {/* Stats Tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Progress */}
-        <div className="rounded-lg border border-border bg-card p-4 flex items-center justify-between">
+        <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between">
           <div className="space-y-1">
             <h3 className="font-semibold text-sm text-foreground">Progress</h3>
             <p className="text-3xl font-bold tabular-nums text-foreground">
@@ -74,7 +74,9 @@ export default function Dashboard() {
             </p>
             <p className="text-xs text-muted-foreground">modules complete</p>
           </div>
-          <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
+          <div className="pt-1">
+            <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
+          </div>
         </div>
 
         {/* Blockers */}
