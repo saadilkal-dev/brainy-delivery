@@ -25,7 +25,7 @@ export const mockModules: Module[] = [
     project_id: 'proj-1',
     name: 'Product Catalog',
     description: 'Product listing, search, and filtering for Daikin HVAC units',
-    owner: 'Dev A',
+    owner: 'Ravi',
     status: 'blocked',
     progress_pct: 35,
     estimated_hours: 120,
