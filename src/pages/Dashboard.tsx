@@ -16,15 +16,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function ProgressRing({ value, total, status }: { value: number; total: number; status: string }) {
   const pct = total > 0 ? (value / total) * 100 : 0;
-  const r = 18;
+  const r = 24;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (pct / 100) * circumference;
   const color = status === 'on_track' ? 'hsl(var(--success))' : status === 'at_risk' ? 'hsl(var(--warning))' : 'hsl(var(--destructive))';
 
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" className="shrink-0 -rotate-90">
-      <circle cx="24" cy="24" r={r} fill="none" stroke="hsl(var(--secondary))" strokeWidth="5" />
-      <circle cx="24" cy="24" r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round"
+    <svg width="60" height="60" viewBox="0 0 60 60" className="shrink-0 -rotate-90">
+      <circle cx="30" cy="30" r={r} fill="none" stroke="hsl(var(--secondary))" strokeWidth="5" />
+      <circle cx="30" cy="30" r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round"
         strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-500" />
     </svg>
   );
@@ -74,7 +74,7 @@ export default function Dashboard() {
             </p>
             <p className="text-xs text-muted-foreground mt-auto">modules complete</p>
           </div>
-          <div className="pt-1">
+          <div className="flex items-center">
             <ProgressRing value={dash.overall_progress.completed} total={dash.overall_progress.total} status={dash.overall_progress.status} />
           </div>
         </div>
