@@ -262,14 +262,14 @@ export default function Dashboard() {
                                 initial={{ opacity: 0, x: -6 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-start gap-3"
+                                className="flex items-center gap-3"
                               >
                                 <span className="w-[72px] shrink-0">
                                   <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>
                                     {a.status}
                                   </StatusBadge>
                                 </span>
-                                <span className="font-mono text-[10px] text-muted-foreground leading-relaxed">{a.text}</span>
+                                <span className="font-mono text-[10px] text-muted-foreground">{a.text}</span>
                               </motion.div>
                             ))}
                             {mod.dependencies?.map(d => (
@@ -278,14 +278,14 @@ export default function Dashboard() {
                                 initial={{ opacity: 0, x: -6 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-start gap-3"
+                                className="flex items-center gap-3"
                               >
                                 <span className="w-[72px] shrink-0">
                                   <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>
                                     {d.status}
                                   </StatusBadge>
                                 </span>
-                                <span className="font-mono text-[10px] text-muted-foreground leading-relaxed">{d.description}</span>
+                                <span className="font-mono text-[10px] text-muted-foreground">{d.description}</span>
                               </motion.div>
                             ))}
                           </div>
