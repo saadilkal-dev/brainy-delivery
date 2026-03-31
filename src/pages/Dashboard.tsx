@@ -204,7 +204,7 @@ export default function Dashboard() {
                     }}
                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className={cn(
-                      'rounded-sm border border-border bg-card overflow-hidden border-l-2 relative',
+                      'rounded-sm border border-border bg-card border-l-2 relative',
                       moduleStatusBorderColor[mod.status] || 'border-l-muted-foreground/20',
                       isExpanded && 'shadow-xl ring-1 ring-primary/20',
                       isOtherExpanded && 'opacity-40'
