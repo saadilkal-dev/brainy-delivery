@@ -285,7 +285,7 @@ export default function Dashboard() {
                                     {d.status}
                                   </StatusBadge>
                                 </span>
-                                <span className="font-mono text-[10px] text-muted-foreground leading-relaxed">{d.description}</span>
+                                <span className="font-mono text-[10px] text-muted-foreground">{d.description}</span>
                               </motion.div>
                             ))}
                           </div>
