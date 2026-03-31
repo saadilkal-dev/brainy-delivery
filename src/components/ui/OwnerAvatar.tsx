@@ -35,17 +35,7 @@ interface OwnerAvatarProps {
 
 export function OwnerAvatar({ name, className }: OwnerAvatarProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   const talent = talentData[name];
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
 
   if (!talent) {
     return (
@@ -62,18 +52,21 @@ export function OwnerAvatar({ name, className }: OwnerAvatarProps) {
   const avail = availabilityLabel[talent.availability];
 
   return (
-    <div ref={ref} className="relative inline-flex">
-      <button
-        onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
+    <div
+      className="relative inline-flex"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <span
         className={cn(
-          'inline-flex h-6 w-6 items-center justify-center rounded-full font-mono text-[9px] font-bold shrink-0 transition-all hover:scale-110 hover:ring-2 hover:ring-primary/30',
+          'inline-flex h-6 w-6 items-center justify-center rounded-full font-mono text-[9px] font-bold shrink-0 cursor-default',
           className
         )}
         style={{ backgroundColor: talent.color, color: 'hsl(var(--card))' }}
         title={talent.name}
       >
         {getInitials(name)}
-      </button>
+      </span>
 
       <AnimatePresence>
         {open && (
@@ -82,8 +75,8 @@ export function OwnerAvatar({ name, className }: OwnerAvatarProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 rounded-sm border border-border bg-card p-3 shadow-lg"
-            onClick={(e) => e.stopPropagation()}
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 rounded-sm border border-white/10 p-3 shadow-lg backdrop-blur-md"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
           >
             {/* Header */}
             <div className="flex items-center gap-2 mb-3">
@@ -94,28 +87,28 @@ export function OwnerAvatar({ name, className }: OwnerAvatarProps) {
                 {getInitials(name)}
               </span>
               <div>
-                <p className="font-heading text-sm font-semibold text-foreground">{talent.name}</p>
+                <p className="font-heading text-sm font-semibold text-white">{talent.name}</p>
                 <div className="flex items-center gap-1.5">
                   <span className={cn('h-1.5 w-1.5 rounded-full', avail.dotClass)} />
-                  <span className="font-mono text-[10px] text-muted-foreground">{avail.text}</span>
+                  <span className="font-mono text-[10px] text-white/60">{avail.text}</span>
                 </div>
               </div>
             </div>
 
-            <div className="h-px bg-border mb-3" />
+            <div className="h-px bg-white/10 mb-3" />
 
             {/* Hours */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider">Logged</span>
-                <span className="font-mono text-xs text-foreground font-semibold">{talent.logged_hours}h</span>
+                <span className="font-mono text-[10px] text-white/40 uppercase tracking-wider">Logged</span>
+                <span className="font-mono text-xs text-white font-semibold">{talent.logged_hours}h</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider">Expected</span>
-                <span className="font-mono text-xs text-foreground font-semibold">{talent.expected_hours}h</span>
+                <span className="font-mono text-[10px] text-white/40 uppercase tracking-wider">Expected</span>
+                <span className="font-mono text-xs text-white font-semibold">{talent.expected_hours}h</span>
               </div>
               {/* Progress bar */}
-              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
@@ -124,7 +117,7 @@ export function OwnerAvatar({ name, className }: OwnerAvatarProps) {
                   style={{ width: `${Math.min(pct, 100)}%` }}
                 />
               </div>
-              <p className="font-mono text-[10px] text-muted-foreground/50 text-right">{pct}% utilized</p>
+              <p className="font-mono text-[10px] text-white/30 text-right">{pct}% utilized</p>
             </div>
           </motion.div>
         )}
