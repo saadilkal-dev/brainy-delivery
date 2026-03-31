@@ -269,7 +269,7 @@ export default function Dashboard() {
                                     {a.status}
                                   </StatusBadge>
                                 </span>
-                                <span className="font-mono text-[10px] text-muted-foreground leading-relaxed">{a.text}</span>
+                                <span className="font-mono text-[10px] text-muted-foreground">{a.text}</span>
                               </motion.div>
                             ))}
                             {mod.dependencies?.map(d => (
