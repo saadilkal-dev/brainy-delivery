@@ -99,8 +99,8 @@ export default function Dashboard() {
         </div>
 
         {/* Activity */}
-        <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-          <h3 className="text-base font-bold text-foreground">Activity</h3>
+        <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+          <h3 className="font-semibold text-sm text-foreground">Activity</h3>
           <p className="text-3xl font-bold tabular-nums">{dash.brain_activity.count}</p>
           <div className="h-1" />
           <p className="text-xs text-muted-foreground">extractions this week</p>
