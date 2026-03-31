@@ -29,7 +29,7 @@ export function AppSidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Wordmark */}
-      <div className="px-5 py-5 border-b border-sidebar-border">
+      <div className="px-3 py-3 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="relative">
             <Brain className="h-5 w-5 text-primary" />
