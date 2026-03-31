@@ -93,9 +93,9 @@ export default function Dashboard() {
         <div className="rounded-lg border border-border bg-card p-4 flex flex-col min-h-[140px]">
           <h3 className="font-semibold text-sm text-foreground">Delivery</h3>
           <p className={cn('text-2xl font-bold tabular-nums whitespace-nowrap mt-2', driftColor)}>
-            {dash.predicted_delivery.date}
+            {format(new Date(dash.predicted_delivery.date), 'dd/MM/yyyy')}
           </p>
-          <p className="text-xs text-muted-foreground mt-auto">Target: {dash.predicted_delivery.original_target}</p>
+          <p className="text-xs text-muted-foreground mt-auto">Target: {format(new Date(dash.predicted_delivery.original_target), 'dd/MM/yyyy')}</p>
         </div>
 
         {/* Activity */}
