@@ -16,6 +16,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ShieldAlert, Calendar, Brain, User, Clock } from 'lucide-react';
+import { OwnerAvatar } from '@/components/ui/OwnerAvatar';
 
 const CURRENT_USER = 'Ravi';
 

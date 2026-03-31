@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { ChevronDown, Plus, X, Brain, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Module } from '@/types';
+import { OwnerAvatar } from '@/components/ui/OwnerAvatar';
 
 export default function Plan() {
   const { id: projectId } = useParams<{ id: string }>();
