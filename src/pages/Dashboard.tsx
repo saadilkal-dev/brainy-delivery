@@ -10,7 +10,7 @@ import { StatusBadge, getModuleStatusVariant, getExtractionTypeVariant, getSourc
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ShieldAlert, Calendar, Brain } from 'lucide-react';
 
@@ -52,18 +52,8 @@ export default function Dashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  
 
-  useEffect(() => {
-    if (!expandedModule) return;
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const card = target.closest('[data-module-card]');
-      if (!card) setExpandedModule(null);
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [expandedModule]);
 
   const dashQ = useQuery({ queryKey: ['dashboard', id], queryFn: () => getDashboard(id!), enabled: !!id });
   const modsQ = useQuery({ queryKey: ['modules', id], queryFn: () => getModules(id!), enabled: !!id });
@@ -181,73 +171,127 @@ export default function Dashboard() {
             onAction={() => navigate(`/projects/${id}/plan`)}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {modules.map((mod, i) => (
-              <motion.div
-                data-module-card
-                key={mod.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className={cn(
-                  'rounded-sm border border-border bg-card overflow-hidden border-l-2',
-                  moduleStatusBorderColor[mod.status] || 'border-l-muted-foreground/20'
-                )}
-              >
-                <button
-                  onClick={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)}
-                  className="w-full p-4 text-left"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="font-heading font-semibold text-sm text-foreground leading-snug">{mod.name}</h3>
-                    <StatusBadge variant={getModuleStatusVariant(mod.status)}>
-                      {mod.status.replace('_', ' ')}
-                    </StatusBadge>
-                  </div>
-                  {mod.owner && (
-                    <p className="font-mono text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-wider">{mod.owner}</p>
-                  )}
-                  <div className="flex items-center gap-2 mb-2">
-                    <ProgressBar
-                      value={mod.progress_pct}
-                      blocked={mod.status === 'blocked'}
-                      className="flex-1"
-                    />
-                    <span className="font-mono text-[10px] text-muted-foreground/60 shrink-0">{mod.progress_pct}%</span>
-                  </div>
-                  {mod.status === 'blocked' && mod.blocker_reason && (
-                    <p className="font-mono text-[10px] text-destructive/80 mt-1">⛔ {mod.blocker_reason}</p>
-                  )}
-                  {mod.assumptions && mod.assumptions.length > 0 && (
-                    <div className="mt-2">
-                      <StatusBadge variant="amber">⚠ {mod.assumptions.length} assumption{mod.assumptions.length > 1 ? 's' : ''}</StatusBadge>
-                    </div>
-                  )}
-                  <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/40 mt-2 transition-transform', expandedModule === mod.id && 'rotate-180')} />
-                </button>
+          <div className="relative">
+            {/* Blur overlay when a card is expanded */}
+            <AnimatePresence>
+              {expandedModule && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 z-20 bg-background/40 backdrop-blur-[2px]"
+                  onClick={() => setExpandedModule(null)}
+                />
+              )}
+            </AnimatePresence>
 
-                {expandedModule === mod.id && (
-                  <div className="border-t border-border p-4 space-y-2">
-                    {mod.assumptions?.map(a => (
-                      <div key={a.id} className="flex items-center gap-2">
-                        <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>
-                          {a.status}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {modules.map((mod, i) => {
+                const isExpanded = expandedModule === mod.id;
+                const isOtherExpanded = expandedModule !== null && !isExpanded;
+
+                return (
+                  <motion.div
+                    data-module-card
+                    key={mod.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: isExpanded ? 1.03 : 1,
+                      zIndex: isExpanded ? 30 : 1,
+                    }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className={cn(
+                      'rounded-sm border border-border bg-card overflow-hidden border-l-2 relative',
+                      moduleStatusBorderColor[mod.status] || 'border-l-muted-foreground/20',
+                      isExpanded && 'shadow-xl ring-1 ring-primary/20',
+                      isOtherExpanded && 'opacity-40'
+                    )}
+                    style={{ zIndex: isExpanded ? 30 : 1 }}
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedModule(isExpanded ? null : mod.id);
+                      }}
+                      className="w-full p-4 text-left"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <h3 className="font-heading font-semibold text-sm text-foreground leading-snug">{mod.name}</h3>
+                        <StatusBadge variant={getModuleStatusVariant(mod.status)}>
+                          {mod.status.replace('_', ' ')}
                         </StatusBadge>
-                        <span className="font-mono text-[10px] text-muted-foreground">{a.text}</span>
                       </div>
-                    ))}
-                    {mod.dependencies?.map(d => (
-                      <div key={d.id} className="flex items-center gap-2">
-                        <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>
-                          {d.status}
-                        </StatusBadge>
-                        <span className="font-mono text-[10px] text-muted-foreground">{d.description}</span>
+                      {mod.owner && (
+                        <p className="font-mono text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-wider">{mod.owner}</p>
+                      )}
+                      <div className="flex items-center gap-2 mb-2">
+                        <ProgressBar
+                          value={mod.progress_pct}
+                          blocked={mod.status === 'blocked'}
+                          className="flex-1"
+                        />
+                        <span className="font-mono text-[10px] text-muted-foreground/60 shrink-0">{mod.progress_pct}%</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            ))}
+                      {mod.status === 'blocked' && mod.blocker_reason && (
+                        <p className="font-mono text-[10px] text-destructive/80 mt-1">⛔ {mod.blocker_reason}</p>
+                      )}
+                      {mod.assumptions && mod.assumptions.length > 0 && (
+                        <div className="mt-2">
+                          <StatusBadge variant="amber">⚠ {mod.assumptions.length} assumption{mod.assumptions.length > 1 ? 's' : ''}</StatusBadge>
+                        </div>
+                      )}
+                      <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/40 mt-2 transition-transform duration-300', isExpanded && 'rotate-180')} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <div className="border-t border-border p-4 space-y-2">
+                            {mod.assumptions?.map(a => (
+                              <motion.div
+                                key={a.id}
+                                initial={{ opacity: 0, x: -6 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center gap-2"
+                              >
+                                <StatusBadge variant={a.status === 'confirmed' ? 'green' : a.status === 'invalidated' ? 'red' : 'amber'}>
+                                  {a.status}
+                                </StatusBadge>
+                                <span className="font-mono text-[10px] text-muted-foreground">{a.text}</span>
+                              </motion.div>
+                            ))}
+                            {mod.dependencies?.map(d => (
+                              <motion.div
+                                key={d.id}
+                                initial={{ opacity: 0, x: -6 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center gap-2"
+                              >
+                                <StatusBadge variant={d.status === 'overdue' ? 'red' : d.status === 'received' ? 'green' : 'amber'}>
+                                  {d.status}
+                                </StatusBadge>
+                                <span className="font-mono text-[10px] text-muted-foreground">{d.description}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
