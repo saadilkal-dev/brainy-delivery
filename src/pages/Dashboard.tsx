@@ -52,7 +52,7 @@ export default function Dashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  
 
 
   const dashQ = useQuery({ queryKey: ['dashboard', id], queryFn: () => getDashboard(id!), enabled: !!id });
