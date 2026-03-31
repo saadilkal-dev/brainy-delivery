@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { Brain, LayoutDashboard, ListChecks, Rss, ShieldAlert, ChevronDown, Menu, X } from 'lucide-react';
 import { getProjects } from '@/api/projects';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: 'dashboard' },
