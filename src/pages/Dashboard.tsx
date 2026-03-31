@@ -182,7 +182,7 @@ export default function Dashboard() {
             onAction={() => navigate(`/projects/${id}/plan`)}
           />
         ) : (
-          <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {modules.map((mod, i) => {
               const config = moduleStatusConfig[mod.status] || moduleStatusConfig.not_started;
               return (
