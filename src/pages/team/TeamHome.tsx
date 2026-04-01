@@ -239,13 +239,25 @@ function ProjectDetail({ projectId }: { projectId: string }) {
 }
 
 export default function TeamHome() {
-  
   const projectsQ = useQuery({ queryKey: ['projects'], queryFn: getProjects });
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   if (projectsQ.isLoading) return <LoadingSpinner />;
 
   const projects = projectsQ.data ?? [];
+  const currentProject = projects.find(p => p.id === selectedProject);
 
   const handleSwitchRole = () => {
     sessionStorage.removeItem('delivery-brain-role');
@@ -299,11 +311,11 @@ export default function TeamHome() {
               You'll be notified when a consultant creates a delivery plan. Projects and their requirements will appear here automatically.
             </p>
           </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Project list */}
-            <div className="space-y-2">
-              <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Projects</h2>
+        ) : !selectedProject ? (
+          /* Initial view — show all projects as cards */
+          <div>
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">Your Projects</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {projects.map((p, i) => (
                 <motion.button
                   key={p.id}
@@ -311,45 +323,86 @@ export default function TeamHome() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   onClick={() => setSelectedProject(p.id)}
-                  className={cn(
-                    'card-interactive p-4 w-full text-left group',
-                    selectedProject === p.id && 'ring-2 ring-primary/20 bg-primary/[0.02]'
-                  )}
+                  className="card-interactive p-5 w-full text-left group"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 rounded-lg bg-primary/6 shrink-0">
                       <FolderOpen className="h-4 w-4 text-primary/60" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground text-sm truncate">{p.name}</h3>
-                      <p className="text-xs text-muted-foreground">{p.client_name}</p>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-primary transition-colors ml-auto shrink-0" />
                   </div>
+                  <h3 className="font-semibold text-foreground text-sm truncate">{p.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">{p.client_name}</p>
                 </motion.button>
               ))}
             </div>
+          </div>
+        ) : (
+          /* Project selected — dropdown selector + detail view */
+          <div>
+            {/* Project dropdown selector */}
+            <div className="relative mb-6" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="card-elevated px-4 py-3 flex items-center gap-3 w-full sm:w-auto sm:min-w-[280px] transition-colors hover:bg-muted/30"
+              >
+                <div className="p-1.5 rounded-lg bg-primary/8">
+                  <FolderOpen className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{currentProject?.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{currentProject?.client_name}</p>
+                </div>
+                <ChevronDown className={cn(
+                  'h-4 w-4 text-muted-foreground/40 transition-transform',
+                  dropdownOpen && 'rotate-180'
+                )} />
+              </button>
+
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-1.5 w-full sm:w-[280px] card-elevated p-1.5 z-50"
+                  >
+                    <p className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider px-2.5 py-1.5">
+                      Switch project
+                    </p>
+                    {projects.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => { setSelectedProject(p.id); setDropdownOpen(false); }}
+                        className={cn(
+                          'w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center gap-2.5',
+                          p.id === selectedProject
+                            ? 'bg-primary/8 text-primary font-medium'
+                            : 'text-foreground/70 hover:bg-muted/60'
+                        )}
+                      >
+                        <FolderOpen className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                        <div className="min-w-0">
+                          <span className="block truncate text-sm">{p.name}</span>
+                          <span className="text-[10px] text-muted-foreground/50">{p.client_name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Project detail */}
-            <div className="lg:col-span-2">
-              {selectedProject ? (
-                <motion.div
-                  key={selectedProject}
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ProjectDetail projectId={selectedProject} />
-                </motion.div>
-              ) : (
-                <div className="flex items-center justify-center h-full min-h-[300px] text-center">
-                  <div>
-                    <Brain className="h-8 w-8 text-muted-foreground/15 mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">Select a project to view details</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <motion.div
+              key={selectedProject}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ProjectDetail projectId={selectedProject} />
+            </motion.div>
           </div>
         )}
       </div>
