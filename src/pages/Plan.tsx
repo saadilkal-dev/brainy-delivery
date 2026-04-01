@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { ChevronDown, Plus, X, Brain, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Module } from '@/types';
+import { OwnerAvatar } from '@/components/ui/OwnerAvatar';
 
 export default function Plan() {
   const { id: projectId } = useParams<{ id: string }>();
@@ -118,7 +119,7 @@ export default function Plan() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="font-heading font-semibold text-sm text-foreground truncate">{mod.name}</span>
-                    {mod.owner && <StatusBadge variant="grey">{mod.owner}</StatusBadge>}
+                    {mod.owner && <OwnerAvatar name={mod.owner} />}
                     <StatusBadge variant={getModuleStatusVariant(mod.status)}>
                       {mod.status.replace('_', ' ')}
                     </StatusBadge>

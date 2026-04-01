@@ -16,6 +16,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ShieldAlert, Calendar, Brain, User, Clock } from 'lucide-react';
+import { OwnerAvatar } from '@/components/ui/OwnerAvatar';
 
 const CURRENT_USER = 'Ravi';
 
@@ -303,7 +304,10 @@ export default function Dashboard() {
                         </StatusBadge>
                       </div>
                       {mod.owner && (
-                        <p className="text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-wider">{mod.owner}</p>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <OwnerAvatar name={mod.owner} />
+                          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">{mod.owner}</p>
+                        </div>
                       )}
                       <div className="flex items-center gap-2 mb-2">
                         <ProgressBar value={mod.progress_pct} blocked={mod.status === 'blocked'} className="flex-1" />
