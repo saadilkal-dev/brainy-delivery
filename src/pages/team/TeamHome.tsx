@@ -170,8 +170,8 @@ function ProjectDetail({ projectId }: { projectId: string }) {
                                 <li key={idx} className="text-xs text-foreground/70 flex items-start gap-2">
                                   <span className={cn(
                                     'inline-block mt-0.5 h-1.5 w-1.5 rounded-full shrink-0',
-                                    d.status === 'resolved' ? 'bg-success' :
-                                    d.status === 'at_risk' ? 'bg-destructive' : 'bg-amber-400'
+                                    d.status === 'received' ? 'bg-success' :
+                                    d.status === 'overdue' ? 'bg-destructive' : 'bg-warning'
                                   )} />
                                   <span>{d.description} <span className="text-muted-foreground/50">({d.status})</span></span>
                                 </li>
