@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Send, Sparkles, FileText, GitBranch,
-  ChevronRight, PanelRightOpen, PanelRightClose,
-  Clock, Download, Copy, Check, Maximize2,
+  ChevronRight, Copy, Check, ArrowRight,
+  Plus, GripVertical, Edit3, CheckCircle2,
+  AlertTriangle, Clock, Zap, RotateCcw,
+  ClipboardList, Wand2, FolderOpen,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import mermaid from 'mermaid';
+import { streamChat, parseArtifacts, type ChatMessage, type ParsedArtifact } from '@/api/claude';
 
 mermaid.initialize({
   startOnLoad: false,
@@ -24,529 +26,842 @@ mermaid.initialize({
     fontSize: '13px',
   },
   flowchart: { curve: 'basis', padding: 16 },
-  gantt: {
-    titleTopMargin: 16,
-    barHeight: 24,
-    barGap: 6,
-    topPadding: 40,
-    leftPadding: 60,
-    numberSectionStyles: 4,
-  },
+  gantt: { barHeight: 24, barGap: 6, topPadding: 40, sidePadding: 60 },
 });
 
-interface Message {
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Phase = 'brief' | 'extracting' | 'modules' | 'finalize';
+
+interface ExtractedModule {
   id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  suggestions?: string[];
-  artifact?: {
-    type: 'mermaid' | 'plan' | 'timeline';
-    title: string;
-    content: string;
-  };
-  thinking?: string[];
-  timestamp?: number;
+  name: string;
+  description: string;
+  owner: string;
+  estimated_days: number;
+  status: 'not_started' | 'in_progress' | 'complete' | 'blocked';
+  editing?: boolean;
 }
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: '1',
-    role: 'assistant',
-    content: "Hey! I'm your Delivery Brain — ready to co-create your delivery plan. I can work with meeting notes, estimation sheets, or we can start from scratch.\n\nWhat would you like to do?",
-    suggestions: [
-      'Paste meeting notes',
-      'Upload estimation sheet',
-      'Start from scratch',
-      'Review existing plan',
-    ],
-    timestamp: Date.now() - 60000,
-  },
+interface ArtifactState {
+  type: 'mermaid' | 'timeline' | 'modules';
+  title: string;
+  content: string;
+}
+
+interface FollowUpMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  streaming?: boolean;
+}
+
+// ─── Extraction steps for Phase 2 animation ─────────────────────────────────
+
+const EXTRACTION_STEPS = [
+  'Reading project brief...',
+  'Identifying delivery modules...',
+  'Mapping dependencies & risks...',
+  'Estimating timelines...',
+  'Generating architecture diagram...',
+  'Building delivery plan...',
 ];
 
-const MOCK_RESPONSES: Record<string, Message> = {
-  'Start from scratch': {
-    id: '',
-    role: 'assistant',
-    content: "Great, let's build this together. I'll ask some questions to understand the project scope, then generate a plan we can refine.\n\nFirst — what's the core product or feature you're delivering? Give me a one-liner.",
-    suggestions: [
-      'Web application with user auth',
-      'Mobile app MVP',
-      'API platform + integrations',
-      'Let me describe it',
-    ],
-  },
-  'Web application with user auth': {
-    id: '',
-    role: 'assistant',
-    content: "Got it — web app with auth. Let me think through the major workstreams...",
-    thinking: [
-      'Analyzing common web app architecture patterns...',
-      'Identifying core modules: Auth, Frontend, API, Database, Deployment...',
-      'Estimating complexity and dependencies...',
-    ],
-    artifact: {
-      type: 'mermaid',
-      title: 'Delivery Architecture',
-      content: `graph TD
-    A[Project Setup] --> B[Authentication]
-    A --> C[Database Schema]
-    B --> D[Frontend Core]
-    C --> D
-    D --> E[Feature Modules]
-    E --> F[Integration Testing]
-    C --> G[API Layer]
-    G --> E
-    F --> H[Staging Deploy]
-    H --> I[UAT & Feedback]
-    I --> J[Production Launch]
+// ─── Phase bar ───────────────────────────────────────────────────────────────
 
-    style A fill:#f3f0ff,stroke:#7c3aed,color:#1a1a2e
-    style B fill:#f3f0ff,stroke:#7c3aed,color:#1a1a2e
-    style D fill:#f3f0ff,stroke:#7c3aed,color:#1a1a2e
-    style J fill:#ecfdf5,stroke:#059669,color:#1a1a2e`,
-    },
-    suggestions: [
-      'Add more detail to Auth module',
-      'What tech stack do you recommend?',
-      'Add a CI/CD pipeline stage',
-      'Generate timeline estimates',
-    ],
-  },
-  'Paste meeting notes': {
-    id: '',
-    role: 'assistant',
-    content: "Perfect — paste your meeting notes or transcript below and I'll extract:\n\n• **Decisions** made\n• **Action items** and owners\n• **Blockers** or risks identified\n• **Requirements** for the delivery plan\n\nI'll then propose modules and a timeline based on what I find.",
-  },
-  'Generate timeline estimates': {
-    id: '',
-    role: 'assistant',
-    content: "Based on a web app with auth, here's my estimated timeline. These assume a team of 2-3 developers:",
-    artifact: {
-      type: 'timeline',
-      title: 'Delivery Timeline',
-      content: `gantt
-    title Delivery Roadmap
-    dateFormat  YYYY-MM-DD
-    section Setup
-    Project Setup & Env        :done, setup, 2026-04-01, 3d
-    Database Schema Design     :done, db, 2026-04-01, 4d
-    section Core
-    Authentication Module      :active, auth, 2026-04-04, 5d
-    API Layer                  :api, 2026-04-07, 7d
-    Frontend Core              :fe, 2026-04-09, 8d
-    section Features
-    Feature Modules            :feat, 2026-04-17, 10d
-    section QA
-    Integration Testing        :test, 2026-04-28, 5d
-    UAT & Feedback             :uat, 2026-05-05, 5d
-    section Launch
-    Production Deploy          :launch, 2026-05-12, 2d`,
-    },
-    suggestions: [
-      'Adjust timeline — we have 4 developers',
-      'Add buffer for client review',
-      'What are the key risks?',
-      'Finalize this plan',
-    ],
-  },
-};
+const PHASES: { id: Phase; label: string; num: number }[] = [
+  { id: 'brief', label: 'Brief', num: 1 },
+  { id: 'extracting', label: 'Extracting', num: 2 },
+  { id: 'modules', label: 'Modules', num: 3 },
+  { id: 'finalize', label: 'Finalize', num: 4 },
+];
 
-function ThinkingIndicator({ steps }: { steps: string[] }) {
-  const [visibleSteps, setVisibleSteps] = useState(0);
-
-  useEffect(() => {
-    if (visibleSteps < steps.length) {
-      const timer = setTimeout(() => setVisibleSteps(v => v + 1), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [visibleSteps, steps.length]);
-
+function PhaseBar({ current }: { current: Phase }) {
+  const currentIdx = PHASES.findIndex(p => p.id === current);
   return (
-    <div className="space-y-2 mb-3 py-2 px-3 rounded-lg bg-primary/[0.03] border border-primary/8">
-      {steps.slice(0, visibleSteps).map((step, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -8 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-2 text-xs text-primary/70"
-        >
-          <Sparkles className="h-3 w-3 animate-pulse-soft" />
-          <span>{step}</span>
-          <Check className="h-3 w-3 text-success/60 ml-auto" />
-        </motion.div>
-      ))}
-      {visibleSteps < steps.length && (
-        <div className="flex items-center gap-1.5 pl-0.5">
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-thinking-dot"
-              style={{ animationDelay: `${i * 0.2}s` }}
-            />
-          ))}
-        </div>
-      )}
+    <div className="flex items-center gap-0 px-6 py-3 border-b border-border bg-white/80 backdrop-blur-sm">
+      {PHASES.map((phase, i) => {
+        const done = i < currentIdx;
+        const active = i === currentIdx;
+        return (
+          <div key={phase.id} className="flex items-center">
+            <div className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              active ? 'bg-primary/10 text-primary' : done ? 'text-success' : 'text-muted-foreground/40'
+            )}>
+              <div className={cn(
+                'w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+                active ? 'bg-primary text-white' : done ? 'bg-success text-white' : 'bg-muted text-muted-foreground/40'
+              )}>
+                {done ? '✓' : phase.num}
+              </div>
+              <span className="hidden sm:block">{phase.label}</span>
+            </div>
+            {i < PHASES.length - 1 && (
+              <div className={cn('w-8 h-px mx-1', done ? 'bg-success/40' : 'bg-border')} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
+// ─── Mermaid diagram renderer ─────────────────────────────────────────────────
+
 function MermaidDiagram({ chart, id }: { chart: string; id: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [svg, setSvg] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [svg, setSvg] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
-    const render = async () => {
+    (async () => {
       try {
-        const uniqueId = `mermaid-${id}-${Date.now()}`;
-        const { svg: rendered } = await mermaid.render(uniqueId, chart);
-        if (!cancelled) {
-          setSvg(rendered);
-          setError('');
-        }
+        const uid = `mermaid-${id}-${Date.now()}`;
+        const { svg: rendered } = await mermaid.render(uid, chart);
+        if (!cancelled) { setSvg(rendered); setError(''); }
       } catch (err: any) {
-        if (!cancelled) {
-          setError(err.message || 'Failed to render diagram');
-          const orphan = document.getElementById(`dmermaid-${id}-${Date.now()}`);
-          orphan?.remove();
-        }
+        if (!cancelled) setError(err.message || 'Render failed');
       }
-    };
-    render();
+    })();
     return () => { cancelled = true; };
   }, [chart, id]);
 
-  if (error) {
-    return (
-      <div className="p-4">
-        <pre className="text-xs font-mono text-foreground/80 leading-relaxed whitespace-pre-wrap bg-muted/30 rounded-lg p-4 border border-border">
-          {chart}
-        </pre>
-        <p className="text-xs text-destructive/60 mt-2">{error}</p>
-      </div>
-    );
-  }
+  if (error) return (
+    <pre className="text-xs font-mono text-muted-foreground/60 p-4 whitespace-pre-wrap">{chart}</pre>
+  );
 
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center p-6 min-h-[300px] [&_svg]:max-w-full"
+      className="flex items-center justify-center p-4 [&_svg]:max-w-full [&_svg]:h-auto"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );
 }
 
-function ArtifactPanel({ artifact, artifactHistory }: {
-  artifact: Message['artifact'];
-  artifactHistory: Message['artifact'][];
+// ─── Right panel — live plan artifact ────────────────────────────────────────
+
+function LivePlanPanel({
+  artifact,
+  streaming,
+  streamingText,
+}: {
+  artifact: ArtifactState | null;
+  streaming: boolean;
+  streamingText: string;
 }) {
-  const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
+  const [tab, setTab] = useState<'preview' | 'source'>('preview');
   const [copied, setCopied] = useState(false);
 
-  if (!artifact) return null;
-
-  const isMermaid = artifact.type === 'mermaid' || artifact.type === 'timeline';
-  const versionNum = artifactHistory.length;
-
   const handleCopy = () => {
-    navigator.clipboard.writeText(artifact.content);
+    if (artifact) navigator.clipboard.writeText(artifact.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  if (!artifact && !streaming) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-8">
+        <div className="p-4 rounded-2xl bg-primary/6 border border-primary/10">
+          <GitBranch className="h-8 w-8 text-primary/40" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-foreground/60">Plan preview</p>
+          <p className="text-xs text-muted-foreground/50 mt-1">Architecture diagrams and timelines will appear here as the AI works</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/20">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/20 shrink-0">
         <GitBranch className="h-3.5 w-3.5 text-primary" />
-        <span className="text-sm font-medium text-foreground flex-1 truncate">{artifact.title}</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/8 text-primary/70 font-mono">
-          v{versionNum}
+        <span className="text-sm font-medium text-foreground flex-1 truncate">
+          {artifact?.title ?? 'Generating plan...'}
         </span>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center border-b border-border px-4">
-        <button
-          onClick={() => setActiveTab('preview')}
-          className={cn(
-            'text-xs font-medium px-3 py-2 border-b-2 transition-colors',
-            activeTab === 'preview' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Preview
-        </button>
-        <button
-          onClick={() => setActiveTab('code')}
-          className={cn(
-            'text-xs font-medium px-3 py-2 border-b-2 transition-colors',
-            activeTab === 'code' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Source
-        </button>
-        <div className="flex-1" />
-        <button onClick={handleCopy} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" title="Copy">
-          {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
-        {activeTab === 'preview' ? (
-          isMermaid ? (
-            <MermaidDiagram chart={artifact.content} id={artifact.title.replace(/\s/g, '-')} />
-          ) : (
-            <div className="p-4">
-              <pre className="text-xs font-mono text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                {artifact.content}
-              </pre>
-            </div>
-          )
-        ) : (
-          <div className="p-4">
-            <pre className="text-xs font-mono text-foreground/70 leading-relaxed whitespace-pre-wrap bg-muted/30 rounded-lg p-4 border border-border">
-              {artifact.content}
-            </pre>
+        {artifact && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/8 text-primary/70 font-mono">
+            {artifact.type}
+          </span>
+        )}
+        {streaming && (
+          <div className="flex gap-1">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-thinking-dot"
+                style={{ animationDelay: `${i * 0.2}s` }} />
+            ))}
           </div>
         )}
+      </div>
+
+      {artifact && (
+        <div className="flex items-center border-b border-border px-4 shrink-0">
+          {['preview', 'source'].map(t => (
+            <button key={t} onClick={() => setTab(t as any)}
+              className={cn('text-xs font-medium px-3 py-2 border-b-2 transition-colors capitalize',
+                tab === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              )}>
+              {t}
+            </button>
+          ))}
+          <div className="flex-1" />
+          <button onClick={handleCopy} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground">
+            {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-auto">
+        {streaming && !artifact ? (
+          <div className="p-4">
+            <pre className="text-xs font-mono text-foreground/50 whitespace-pre-wrap leading-relaxed">
+              {streamingText}
+            </pre>
+          </div>
+        ) : artifact && tab === 'preview' ? (
+          (artifact.type === 'mermaid' || artifact.type === 'timeline') ? (
+            <MermaidDiagram chart={artifact.content} id={artifact.title.replace(/\s/g, '-')} />
+          ) : (
+            <pre className="text-xs font-mono text-foreground/70 p-4 whitespace-pre-wrap">{artifact.content}</pre>
+          )
+        ) : artifact ? (
+          <pre className="text-xs font-mono text-foreground/60 p-4 whitespace-pre-wrap bg-muted/20">{artifact.content}</pre>
+        ) : null}
       </div>
     </div>
   );
 }
 
-export default function CoCreate() {
-  const { id } = useParams();
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [showArtifact, setShowArtifact] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+// ─── Module card (Phase 3) ────────────────────────────────────────────────────
 
-  const latestArtifact = [...messages].reverse().find(m => m.artifact)?.artifact;
-  const artifactHistory = messages.filter(m => m.artifact).map(m => m.artifact!);
+function ModuleCard({
+  mod,
+  onUpdate,
+}: {
+  mod: ExtractedModule;
+  onUpdate: (updated: ExtractedModule) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [localName, setLocalName] = useState(mod.name);
+  const [localDays, setLocalDays] = useState(String(mod.estimated_days));
+  const [localOwner, setLocalOwner] = useState(mod.owner);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleSend = (text: string) => {
-    if (!text.trim()) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: text,
-      timestamp: Date.now(),
-    };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsTyping(true);
-
-    const mockResponse = MOCK_RESPONSES[text];
-    const delay = mockResponse?.thinking ? 2500 : 1200;
-
-    setTimeout(() => {
-      const response: Message = mockResponse
-        ? { ...mockResponse, id: (Date.now() + 1).toString(), timestamp: Date.now() }
-        : {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: `I understand. Let me think about "${text}" in the context of your delivery plan.\n\nCould you elaborate a bit more? I want to make sure I capture this accurately for the plan.`,
-            suggestions: ['Add this as a requirement', 'Show updated plan', 'Continue planning'],
-            timestamp: Date.now(),
-          };
-
-      setIsTyping(false);
-      setMessages(prev => [...prev, response]);
-    }, delay);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend(input);
-    }
+  const save = () => {
+    onUpdate({ ...mod, name: localName, estimated_days: Number(localDays) || 1, owner: localOwner });
+    setEditing(false);
   };
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex">
-      {/* Chat pane */}
-      <div className={cn(
-        'flex flex-col transition-all duration-300 bg-background',
-        showArtifact && latestArtifact ? 'w-1/2 border-r border-border' : 'w-full max-w-3xl mx-auto'
-      )}>
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
-          <AnimatePresence>
-            {messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={cn(
-                  'flex gap-3',
-                  msg.role === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
-                {msg.role === 'assistant' && (
-                  <div className="shrink-0 mt-1">
-                    <div className="p-1.5 rounded-xl bg-primary/8 border border-primary/10">
-                      <Brain className="h-4 w-4 text-primary" />
-                    </div>
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="card-elevated p-4 group"
+    >
+      {editing ? (
+        <div className="space-y-2">
+          <input
+            autoFocus
+            value={localName}
+            onChange={e => setLocalName(e.target.value)}
+            className="w-full text-sm font-semibold bg-muted/30 border border-primary/20 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+          <div className="flex gap-2">
+            <input
+              value={localOwner}
+              onChange={e => setLocalOwner(e.target.value)}
+              placeholder="Owner"
+              className="flex-1 text-xs bg-muted/30 border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/20"
+            />
+            <input
+              value={localDays}
+              onChange={e => setLocalDays(e.target.value)}
+              placeholder="Days"
+              type="number"
+              className="w-20 text-xs bg-muted/30 border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/20"
+            />
+          </div>
+          <div className="flex gap-2 pt-1">
+            <button onClick={save} className="text-xs px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">Save</button>
+            <button onClick={() => setEditing(false)} className="text-xs px-3 py-1.5 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors">Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-start gap-3">
+          <div className="text-muted-foreground/20 group-hover:text-muted-foreground/40 transition-colors pt-0.5 cursor-grab shrink-0">
+            <GripVertical className="h-4 w-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-foreground text-sm">{mod.name}</h4>
+            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{mod.description}</p>
+            <div className="flex items-center gap-3 mt-2">
+              {mod.owner && (
+                <span className="text-xs text-muted-foreground/60">{mod.owner}</span>
+              )}
+              <span className="text-xs font-mono text-primary/70 bg-primary/6 px-1.5 py-0.5 rounded">
+                {mod.estimated_days}d
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setEditing(true)}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+          >
+            <Edit3 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ─── Main CoCreate component ──────────────────────────────────────────────────
+
+export default function CoCreate() {
+  const { id } = useParams();
+
+  // Phase state
+  const [phase, setPhase] = useState<Phase>('brief');
+  const [brief, setBrief] = useState('');
+  const [extractionStep, setExtractionStep] = useState(0);
+  const [modules, setModules] = useState<ExtractedModule[]>([]);
+  const [artifact, setArtifact] = useState<ArtifactState | null>(null);
+  const [streamingText, setStreamingText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  // Follow-up chat (bottom bar, all phases)
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [followUps, setFollowUps] = useState<FollowUpMessage[]>([]);
+  const [followInput, setFollowInput] = useState('');
+  const [followStreaming, setFollowStreaming] = useState(false);
+  const followEndRef = useRef<HTMLDivElement>(null);
+
+  // Starter card refs
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-scroll follow-up chat
+  useEffect(() => {
+    followEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [followUps]);
+
+  // ── Phase 2: extraction animation ──
+  useEffect(() => {
+    if (phase !== 'extracting') return;
+    if (extractionStep >= EXTRACTION_STEPS.length) return;
+    const t = setTimeout(() => setExtractionStep(s => s + 1), 900);
+    return () => clearTimeout(t);
+  }, [phase, extractionStep]);
+
+  // ── Analyze brief with Claude ──
+  const analyzeBrief = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+    setPhase('extracting');
+    setExtractionStep(0);
+    setStreamingText('');
+    setArtifact(null);
+    setIsStreaming(true);
+
+    const messages: ChatMessage[] = [
+      {
+        role: 'user',
+        content: `Please analyze this project brief and generate a full delivery plan.\n\nInclude:\n1. A list of delivery modules as an <artifact type="modules"> block\n2. An architecture diagram as an <artifact type="mermaid"> block\n3. A timeline as an <artifact type="timeline"> block\n\nBrief:\n${text}`,
+      },
+    ];
+    setChatHistory(messages);
+
+    let fullText = '';
+    try {
+      await streamChat(
+        messages,
+        (chunk) => {
+          fullText += chunk;
+          setStreamingText(fullText);
+
+          // Parse artifacts as they arrive
+          const { artifacts } = parseArtifacts(fullText);
+          if (artifacts.length > 0) {
+            // Prefer mermaid first, then timeline
+            const mermaidArt = artifacts.find(a => a.type === 'mermaid') || artifacts.find(a => a.type === 'timeline');
+            if (mermaidArt) setArtifact(mermaidArt);
+          }
+        },
+        (done) => {
+          setIsStreaming(false);
+          const { clean, artifacts } = parseArtifacts(done);
+          setChatHistory(prev => [...prev, { role: 'assistant', content: clean }]);
+
+          // Extract modules from modules artifact
+          const modulesArt = artifacts.find(a => a.type === 'modules');
+          const mermaidArt = artifacts.find(a => a.type === 'mermaid') || artifacts.find(a => a.type === 'timeline');
+
+          if (mermaidArt) setArtifact(mermaidArt);
+
+          if (modulesArt) {
+            try {
+              const parsed: any[] = JSON.parse(modulesArt.content);
+              setModules(parsed.map((m, i) => ({
+                id: `mod-${i}`,
+                name: m.name,
+                description: m.description || '',
+                owner: m.owner || '',
+                estimated_days: m.estimated_days || 5,
+                status: 'not_started',
+              })));
+            } catch {
+              // Fall back to mock modules if JSON parse fails
+              setModules([
+                { id: 'mod-0', name: 'Project Setup', description: 'Repository, environments, CI/CD pipeline', owner: '', estimated_days: 3, status: 'not_started' },
+                { id: 'mod-1', name: 'Core Features', description: 'Primary product functionality', owner: '', estimated_days: 10, status: 'not_started' },
+                { id: 'mod-2', name: 'QA & Testing', description: 'Integration tests, UAT', owner: '', estimated_days: 5, status: 'not_started' },
+                { id: 'mod-3', name: 'Deployment', description: 'Production release & monitoring', owner: '', estimated_days: 2, status: 'not_started' },
+              ]);
+            }
+          } else {
+            // If no modules artifact, still move to modules phase with empty list
+            setModules([]);
+          }
+
+          setPhase('modules');
+        },
+        { project_id: id }
+      );
+    } catch (err) {
+      setIsStreaming(false);
+      setPhase('brief');
+    }
+  }, [id]);
+
+  // ── Follow-up chat (bottom bar) ──
+  const handleFollowUp = useCallback(async () => {
+    if (!followInput.trim() || followStreaming) return;
+    const text = followInput.trim();
+    setFollowInput('');
+    setFollowStreaming(true);
+
+    const userMsg: FollowUpMessage = { role: 'user', content: text };
+    setFollowUps(prev => [...prev, userMsg]);
+
+    const messages: ChatMessage[] = [
+      ...chatHistory,
+      { role: 'user', content: text },
+    ];
+    setChatHistory(messages);
+
+    const assistantMsg: FollowUpMessage = { role: 'assistant', content: '', streaming: true };
+    setFollowUps(prev => [...prev, assistantMsg]);
+
+    let fullText = '';
+    try {
+      await streamChat(
+        messages,
+        (chunk) => {
+          fullText += chunk;
+          setFollowUps(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { role: 'assistant', content: fullText, streaming: true };
+            return updated;
+          });
+
+          // Check for new artifacts in follow-up responses
+          const { artifacts } = parseArtifacts(fullText);
+          const newArt = artifacts.find(a => a.type === 'mermaid') || artifacts.find(a => a.type === 'timeline');
+          if (newArt) setArtifact(newArt);
+        },
+        (done) => {
+          const { clean, artifacts } = parseArtifacts(done);
+          setChatHistory(prev => [...prev, { role: 'assistant', content: clean }]);
+          setFollowUps(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { role: 'assistant', content: clean, streaming: false };
+            return updated;
+          });
+          const newArt = artifacts.find(a => a.type === 'mermaid') || artifacts.find(a => a.type === 'timeline');
+          if (newArt) setArtifact(newArt);
+          setFollowStreaming(false);
+        },
+        { project_id: id }
+      );
+    } catch {
+      setFollowStreaming(false);
+    }
+  }, [followInput, followStreaming, chatHistory, id]);
+
+  const reset = () => {
+    setPhase('brief');
+    setBrief('');
+    setModules([]);
+    setArtifact(null);
+    setStreamingText('');
+    setChatHistory([]);
+    setFollowUps([]);
+    setExtractionStep(0);
+  };
+
+  // ── Render ──
+
+  return (
+    <div className="h-[calc(100vh-3.5rem)] flex flex-col">
+      <PhaseBar current={phase} />
+
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left: phase content */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <div className="flex-1 overflow-y-auto">
+
+            {/* ── Phase 1: Brief ── */}
+            <AnimatePresence mode="wait">
+              {phase === 'brief' && (
+                <motion.div
+                  key="brief"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full flex flex-col px-8 py-10 max-w-2xl mx-auto w-full"
+                >
+                  <div className="mb-8">
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="flex items-center gap-3 mb-4"
+                    >
+                      <div className="p-2 rounded-xl bg-primary/8 border border-primary/10">
+                        <Brain className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="font-heading text-xl font-bold text-foreground">Tell me about the project</h2>
+                        <p className="text-sm text-muted-foreground">Paste a brief, meeting notes, or describe what you're building</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Starter cards */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                      className="grid grid-cols-3 gap-3 mb-6"
+                    >
+                      {[
+                        { icon: ClipboardList, label: 'Paste meeting notes', placeholder: 'We discussed building a service portal for Daikin...\n\nRequirements:\n- Product catalog with search\n- Service request system\n- Reporting dashboard\n\nTimeline: 3 months\nTeam: 3 developers' },
+                        { icon: Wand2, label: 'Describe from scratch', placeholder: "We're building a B2B SaaS platform for logistics companies. Core features include real-time shipment tracking, automated invoicing, and a driver management portal. Target launch in 4 months with a team of 4." },
+                        { icon: FolderOpen, label: 'Existing project', placeholder: 'We have an existing e-commerce platform that needs:\n- Checkout flow redesign\n- Payment gateway integration (Stripe)\n- Mobile app (React Native)\n- Admin dashboard improvements\n\nDeadline: Q2 2026' },
+                      ].map(({ icon: Icon, label, placeholder }) => (
+                        <button
+                          key={label}
+                          onClick={() => {
+                            setBrief(placeholder);
+                            textareaRef.current?.focus();
+                          }}
+                          className="card-interactive p-4 text-left group flex flex-col gap-2 hover:ring-1 hover:ring-primary/20"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/6 w-fit group-hover:bg-primary/10 transition-colors">
+                            <Icon className="h-4 w-4 text-primary/70 group-hover:text-primary transition-colors" />
+                          </div>
+                          <span className="text-xs font-medium text-foreground/80">{label}</span>
+                        </button>
+                      ))}
+                    </motion.div>
+
+                    {/* Big textarea */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <textarea
+                        ref={textareaRef}
+                        value={brief}
+                        onChange={e => setBrief(e.target.value)}
+                        placeholder="Paste client brief, meeting notes, requirements, or just describe the project in your own words..."
+                        className="w-full h-48 resize-none rounded-xl border border-border bg-white px-4 py-3 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all leading-relaxed"
+                      />
+                      <div className="flex items-center justify-between mt-3">
+                        <p className="text-xs text-muted-foreground/40">
+                          {brief.length > 0 ? `${brief.length} characters` : 'The more detail you provide, the better the plan'}
+                        </p>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => analyzeBrief(brief)}
+                          disabled={!brief.trim()}
+                          className={cn(
+                            'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all',
+                            brief.trim()
+                              ? 'bg-primary text-white hover:bg-primary/90 shadow-sm shadow-primary/20'
+                              : 'bg-muted text-muted-foreground/40 cursor-not-allowed'
+                          )}
+                        >
+                          <Wand2 className="h-4 w-4" />
+                          Analyze with AI
+                          <ArrowRight className="h-4 w-4" />
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   </div>
-                )}
+                </motion.div>
+              )}
 
-                <div className={cn(
-                  'max-w-[80%]',
-                  msg.role === 'user'
-                    ? 'bg-primary text-white rounded-2xl rounded-br-md px-4 py-3 shadow-sm'
-                    : ''
-                )}>
-                  {msg.thinking && <ThinkingIndicator steps={msg.thinking} />}
+              {/* ── Phase 2: Extracting ── */}
+              {phase === 'extracting' && (
+                <motion.div
+                  key="extracting"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full flex flex-col items-center justify-center px-8 py-10 max-w-lg mx-auto w-full"
+                >
+                  <div className="mb-8 text-center">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                      className="p-3 rounded-2xl bg-primary/8 border border-primary/10 w-fit mx-auto mb-4"
+                    >
+                      <Brain className="h-6 w-6 text-primary" />
+                    </motion.div>
+                    <h2 className="font-heading text-lg font-bold text-foreground mb-1">Analyzing your brief</h2>
+                    <p className="text-sm text-muted-foreground">Building your delivery plan with AI...</p>
+                  </div>
 
-                  <div className={cn(
-                    'text-sm leading-relaxed whitespace-pre-wrap',
-                    msg.role === 'assistant' && 'text-foreground/85'
-                  )}>
-                    {msg.content.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
-                      if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>;
-                      }
-                      return <span key={i}>{part}</span>;
+                  <div className="w-full space-y-2">
+                    {EXTRACTION_STEPS.map((step, i) => {
+                      const done = i < extractionStep;
+                      const active = i === extractionStep;
+                      return (
+                        <motion.div
+                          key={step}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: done || active ? 1 : 0.3, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className="flex items-center gap-3 py-2 px-3 rounded-lg"
+                        >
+                          <div className={cn(
+                            'w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all',
+                            done ? 'bg-success' : active ? 'bg-primary animate-pulse-soft' : 'bg-muted'
+                          )}>
+                            {done
+                              ? <Check className="h-3 w-3 text-white" />
+                              : active
+                              ? <div className="w-2 h-2 rounded-full bg-white" />
+                              : <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                            }
+                          </div>
+                          <span className={cn(
+                            'text-sm transition-colors',
+                            done ? 'text-foreground/60 line-through decoration-success/40' : active ? 'text-foreground font-medium' : 'text-muted-foreground/40'
+                          )}>
+                            {step}
+                          </span>
+                        </motion.div>
+                      );
                     })}
                   </div>
+                </motion.div>
+              )}
 
-                  {/* Suggestion chips */}
-                  {msg.suggestions && msg.suggestions.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {msg.suggestions.map(suggestion => (
-                        <motion.button
-                          key={suggestion}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          onClick={() => handleSend(suggestion)}
-                          className="text-xs px-3 py-1.5 rounded-full border border-primary/15 text-primary/80 hover:bg-primary/8 hover:text-primary hover:border-primary/25 transition-all font-medium"
-                        >
-                          {suggestion}
-                        </motion.button>
-                      ))}
+              {/* ── Phase 3: Modules ── */}
+              {phase === 'modules' && (
+                <motion.div
+                  key="modules"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="px-6 py-6 max-w-2xl mx-auto w-full"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="font-heading text-lg font-bold text-foreground">Delivery Modules</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Review, edit, and reorder — then finalize</p>
                     </div>
-                  )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setModules(prev => [...prev, {
+                          id: `mod-${Date.now()}`,
+                          name: 'New Module',
+                          description: 'Describe this module',
+                          owner: '',
+                          estimated_days: 5,
+                          status: 'not_started',
+                        }])}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/20 text-primary text-xs font-medium hover:bg-primary/6 transition-colors"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Add module
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* Artifact indicator */}
-                  {msg.artifact && (
+                  <div className="space-y-2 mb-6">
+                    {modules.map((mod, i) => (
+                      <motion.div
+                        key={mod.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                      >
+                        <ModuleCard
+                          mod={mod}
+                          onUpdate={updated => setModules(prev => prev.map(m => m.id === updated.id ? updated : m))}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-border" />
+                    <div className="text-xs text-muted-foreground/50 font-mono">
+                      {modules.length} modules · ~{modules.reduce((s, m) => s + m.estimated_days, 0)} days total
+                    </div>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    onClick={() => setPhase('finalize')}
+                    className="mt-6 w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-sm shadow-primary/20"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Looks good, finalize plan
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.button>
+                </motion.div>
+              )}
+
+              {/* ── Phase 4: Finalize ── */}
+              {phase === 'finalize' && (
+                <motion.div
+                  key="finalize"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="px-6 py-6 max-w-2xl mx-auto w-full"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-success/8 border border-success/15">
+                      <CheckCircle2 className="h-5 w-5 text-success" />
+                    </div>
+                    <div>
+                      <h2 className="font-heading text-lg font-bold text-foreground">Plan finalized</h2>
+                      <p className="text-xs text-muted-foreground">{modules.length} modules · ready to start delivery</p>
+                    </div>
+                  </div>
+
+                  {/* Module summary */}
+                  <div className="space-y-2 mb-6">
+                    {modules.map((mod, i) => (
+                      <div key={mod.id} className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-muted/30 border border-border">
+                        <span className="text-xs font-mono text-primary/50 w-6 shrink-0">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span className="text-sm font-medium text-foreground flex-1">{mod.name}</span>
+                        {mod.owner && <span className="text-xs text-muted-foreground/60">{mod.owner}</span>}
+                        <span className="text-xs font-mono bg-primary/6 text-primary/70 px-2 py-0.5 rounded shrink-0">
+                          {mod.estimated_days}d
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-3">
                     <button
-                      onClick={() => setShowArtifact(true)}
-                      className="flex items-center gap-2 mt-3 text-xs text-primary/70 hover:text-primary transition-colors group bg-primary/[0.04] rounded-lg px-3 py-2 border border-primary/10 hover:border-primary/20"
+                      onClick={reset}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
                     >
-                      <FileText className="h-3.5 w-3.5" />
-                      <span className="font-medium">{msg.artifact.title}</span>
-                      <span className="text-primary/40 text-[10px] font-mono ml-1">{msg.artifact.type}</span>
-                      <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform ml-auto" />
+                      <RotateCcw className="h-4 w-4" />
+                      Start over
                     </button>
-                  )}
+                    <button className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-sm shadow-primary/20">
+                      <Zap className="h-4 w-4" />
+                      Start delivery
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* ── Follow-up chat bar (persistent bottom) ── */}
+          {(phase === 'modules' || phase === 'finalize' || followUps.length > 0) && (
+            <div className="border-t border-border bg-white shrink-0">
+              {/* Previous follow-up messages */}
+              {followUps.length > 0 && (
+                <div className="max-h-40 overflow-y-auto px-4 pt-3 space-y-2">
+                  {followUps.map((msg, i) => (
+                    <div key={i} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                      {msg.role === 'assistant' && (
+                        <div className="p-1 rounded-md bg-primary/8 border border-primary/10 shrink-0 h-fit mt-0.5">
+                          <Brain className="h-3 w-3 text-primary" />
+                        </div>
+                      )}
+                      <div className={cn(
+                        'text-xs px-3 py-2 rounded-xl max-w-[75%] leading-relaxed',
+                        msg.role === 'user'
+                          ? 'bg-primary text-white rounded-br-md'
+                          : 'text-foreground/80'
+                      )}>
+                        {msg.content}
+                        {msg.streaming && (
+                          <span className="inline-flex gap-0.5 ml-1">
+                            {[0,1,2].map(i => (
+                              <span key={i} className="w-1 h-1 rounded-full bg-primary/40 animate-thinking-dot"
+                                style={{ animationDelay: `${i*0.2}s` }} />
+                            ))}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={followEndRef} />
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              )}
 
-          {/* Typing indicator */}
-          {isTyping && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-3"
-            >
-              <div className="p-1.5 rounded-xl bg-primary/8 border border-primary/10">
-                <Brain className="h-4 w-4 text-primary animate-pulse-soft" />
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-2">
-                {[0, 1, 2].map(i => (
-                  <div
-                    key={i}
-                    className="h-2 w-2 rounded-full bg-primary/30 animate-thinking-dot"
-                    style={{ animationDelay: `${i * 0.2}s` }}
+              {/* Input row */}
+              <div className="flex items-center gap-2 px-4 py-3">
+                <div className="flex items-center gap-2 flex-1 bg-muted/30 border border-border rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30 transition-all">
+                  <Brain className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
+                  <input
+                    value={followInput}
+                    onChange={e => setFollowInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleFollowUp(); } }}
+                    placeholder="Ask AI anything about this plan..."
+                    className="flex-1 text-sm bg-transparent outline-none placeholder:text-muted-foreground/40"
+                    disabled={followStreaming}
                   />
-                ))}
+                </div>
+                <button
+                  onClick={handleFollowUp}
+                  disabled={!followInput.trim() || followStreaming}
+                  className={cn(
+                    'p-2.5 rounded-xl transition-all shrink-0',
+                    followInput.trim() && !followStreaming
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-muted text-muted-foreground/30'
+                  )}
+                >
+                  <Send className="h-4 w-4" />
+                </button>
               </div>
-            </motion.div>
+            </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
 
-        {/* Input area */}
-        <div className="border-t border-border bg-white p-4">
-          <div className="flex items-end gap-2">
-            <div className="flex-1 relative">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Describe what you want to plan, paste meeting notes, or ask a question..."
-                className="w-full resize-none rounded-xl border border-border bg-muted/20 px-4 py-3 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 min-h-[48px] max-h-[160px] transition-all"
-                rows={1}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height = Math.min(target.scrollHeight, 160) + 'px';
-                }}
-              />
-            </div>
-            <Button
-              onClick={() => handleSend(input)}
-              disabled={!input.trim() || isTyping}
-              size="icon"
-              className="h-12 w-12 rounded-xl shrink-0 shadow-sm"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex items-center justify-between mt-2 px-1">
-            <p className="text-[10px] text-muted-foreground/30">
-              Delivery Brain co-creates plans with you
-            </p>
-            <kbd className="hidden sm:flex items-center gap-0.5 text-[10px] text-muted-foreground/30 font-mono">
-              ⌘K for commands
-            </kbd>
-          </div>
+        {/* Right: live plan panel */}
+        <div className="w-[420px] shrink-0 border-l border-border bg-white hidden lg:flex flex-col">
+          <LivePlanPanel
+            artifact={artifact}
+            streaming={isStreaming}
+            streamingText={streamingText}
+          />
         </div>
       </div>
-
-      {/* Artifact pane */}
-      {latestArtifact && (
-        <>
-          <button
-            onClick={() => setShowArtifact(!showArtifact)}
-            className={cn(
-              'self-start mt-4 p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground z-10',
-              !showArtifact && 'absolute right-4'
-            )}
-            title={showArtifact ? 'Hide artifact' : 'Show artifact'}
-          >
-            {showArtifact ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-          </button>
-
-          <AnimatePresence>
-            {showArtifact && (
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '50%', opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <ArtifactPanel artifact={latestArtifact} artifactHistory={artifactHistory} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
-      )}
     </div>
   );
 }
