@@ -29,7 +29,7 @@ mermaid.initialize({
     barHeight: 24,
     barGap: 6,
     topPadding: 40,
-    sidePadding: 60,
+    leftPadding: 60,
     numberSectionStyles: 4,
   },
 });
