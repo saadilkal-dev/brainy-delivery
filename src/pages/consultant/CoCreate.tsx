@@ -28,7 +28,7 @@ mermaid.initialize({
     fontSize: '13px',
   },
   flowchart: { curve: 'basis', padding: 16 },
-  gantt: { barHeight: 24, barGap: 6, topPadding: 40, sidePadding: 60 },
+  gantt: { barHeight: 24, barGap: 6, topPadding: 40, leftPadding: 60 },
 });
 
 // ─── Types ───────────────────────────────────────────────────────────────────
