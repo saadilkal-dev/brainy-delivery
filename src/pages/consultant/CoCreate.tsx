@@ -325,7 +325,15 @@ function ModuleCard({
 export default function CoCreate() {
   const { id } = useParams();
 
+  // Fetch existing modules for this project
+  const existingModulesQ = useQuery({
+    queryKey: ['modules', id],
+    queryFn: () => getModules(id!),
+    enabled: !!id,
+  });
+
   // Phase state
+  const hasExistingModules = (existingModulesQ.data ?? []).length > 0;
   const [phase, setPhase] = useState<Phase>('brief');
   const [brief, setBrief] = useState('');
   const [extractionStep, setExtractionStep] = useState(0);
@@ -333,6 +341,25 @@ export default function CoCreate() {
   const [artifact, setArtifact] = useState<ArtifactState | null>(null);
   const [streamingText, setStreamingText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
+  // Pre-populate from existing modules (e.g. Daikin project)
+  useEffect(() => {
+    if (initialized || existingModulesQ.isLoading) return;
+    const existing = existingModulesQ.data ?? [];
+    if (existing.length > 0) {
+      setModules(existing.map(m => ({
+        id: m.id,
+        name: m.name,
+        description: m.description || '',
+        owner: m.owner || '',
+        estimated_days: Math.ceil((m.estimated_hours || 40) / 8),
+        status: m.status,
+      })));
+      setPhase('modules');
+    }
+    setInitialized(true);
+  }, [existingModulesQ.data, existingModulesQ.isLoading, initialized]);
 
   // Follow-up chat (bottom bar, all phases)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
