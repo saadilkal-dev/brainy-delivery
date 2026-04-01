@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getModules } from '@/api/modules';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Send, Sparkles, FileText, GitBranch,
