@@ -239,7 +239,7 @@ function ProjectDetail({ projectId }: { projectId: string }) {
 }
 
 export default function TeamHome() {
-  const { useNavigate: _ } = {} as any; // removed unused
+  
   const projectsQ = useQuery({ queryKey: ['projects'], queryFn: getProjects });
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
