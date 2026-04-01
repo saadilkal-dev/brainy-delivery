@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { getProjects } from '@/api/projects';
 import { getModules } from '@/api/modules';
 import { getExtractions } from '@/api/ingestion';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { motion } from 'framer-motion';
+import { OwnerAvatar } from '@/components/ui/OwnerAvatar';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import {
   Code2, Brain, FolderOpen, ArrowRight, AlertTriangle,
-  CheckCircle2, Zap, Clock, TrendingUp, LogOut,
+  CheckCircle2, Zap, Clock, TrendingUp, LogOut, ChevronDown,
+  FileText, Link2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const statusConfig: Record<string, { color: string; bg: string; label: string; icon: any }> = {
   complete:     { color: 'text-success', bg: 'bg-success/8', label: 'Complete', icon: CheckCircle2 },
@@ -21,12 +22,24 @@ const statusConfig: Record<string, { color: string; bg: string; label: string; i
 };
 
 function ProjectDetail({ projectId }: { projectId: string }) {
-  const navigate = useNavigate();
   const modsQ = useQuery({ queryKey: ['modules', projectId], queryFn: () => getModules(projectId) });
   const extQ = useQuery({ queryKey: ['extractions', projectId, 5], queryFn: () => getExtractions(projectId, 5) });
+  const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const expandedRef = useRef<HTMLDivElement>(null);
 
   const modules = modsQ.data ?? [];
   const extractions = extQ.data ?? [];
+
+  // Click outside to collapse
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (expandedRef.current && !expandedRef.current.contains(e.target as Node)) {
+        setExpandedModule(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   if (modsQ.isLoading) return <div className="py-4"><LoadingSpinner /></div>;
 
@@ -57,13 +70,14 @@ function ProjectDetail({ projectId }: { projectId: string }) {
         </div>
       </div>
 
-      {/* Modules */}
+      {/* Modules — clickable to expand */}
       <div>
         <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Modules</h3>
-        <div className="space-y-2">
+        <div className="space-y-2" ref={expandedRef}>
           {modules.map((mod, i) => {
             const config = statusConfig[mod.status] || statusConfig.not_started;
             const StatusIcon = config.icon;
+            const isExpanded = expandedModule === mod.id;
             return (
               <motion.div
                 key={mod.id}
@@ -71,34 +85,114 @@ function ProjectDetail({ projectId }: { projectId: string }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
                 className={cn(
-                  'card-elevated p-3.5 flex items-center gap-3',
-                  mod.status === 'blocked' && 'ring-1 ring-destructive/10'
+                  'card-elevated overflow-hidden cursor-pointer transition-all',
+                  mod.status === 'blocked' && 'ring-1 ring-destructive/10',
+                  isExpanded && 'ring-1 ring-primary/20'
                 )}
+                onClick={() => setExpandedModule(isExpanded ? null : mod.id)}
               >
-                <div className={cn('p-1.5 rounded-lg', config.bg)}>
-                  <StatusIcon className={cn('h-3.5 w-3.5', config.color)} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-foreground truncate">{mod.name}</h4>
-                  {mod.description && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{mod.description}</p>
-                  )}
-                  {mod.status === 'blocked' && mod.blocker_reason && (
-                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{mod.blocker_reason}</span>
-                    </p>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden mb-1">
-                    <div
-                      className={cn('h-full rounded-full', mod.status === 'blocked' ? 'bg-destructive/50' : 'bg-primary/50')}
-                      style={{ width: `${mod.progress_pct}%` }}
-                    />
+                <div className="p-3.5 flex items-center gap-3">
+                  <div className={cn('p-1.5 rounded-lg', config.bg)}>
+                    <StatusIcon className={cn('h-3.5 w-3.5', config.color)} />
                   </div>
-                  <span className="font-mono text-[10px] text-muted-foreground">{mod.progress_pct}%</span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium text-foreground truncate">{mod.name}</h4>
+                    {mod.description && (
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{mod.description}</p>
+                    )}
+                    {mod.status === 'blocked' && mod.blocker_reason && (
+                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{mod.blocker_reason}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <OwnerAvatar name={mod.owner} />
+                    <div className="text-right">
+                      <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden mb-1">
+                        <div
+                          className={cn('h-full rounded-full', mod.status === 'blocked' ? 'bg-destructive/50' : 'bg-primary/50')}
+                          style={{ width: `${mod.progress_pct}%` }}
+                        />
+                      </div>
+                      <span className="font-mono text-[10px] text-muted-foreground">{mod.progress_pct}%</span>
+                    </div>
+                    <ChevronDown className={cn(
+                      'h-3.5 w-3.5 text-muted-foreground/40 transition-transform',
+                      isExpanded && 'rotate-180'
+                    )} />
+                  </div>
                 </div>
+
+                {/* Expanded detail */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                      className="border-t border-border"
+                    >
+                      <div className="p-4 space-y-4">
+                        {/* Assumptions */}
+                        <div>
+                          <h5 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <FileText className="h-3 w-3" /> Assumptions
+                          </h5>
+                          {mod.assumptions && mod.assumptions.length > 0 ? (
+                            <ul className="space-y-1">
+                              {mod.assumptions.map((a, idx) => (
+                                <li key={idx} className="text-xs text-foreground/70 flex items-start gap-2">
+                                  <span className={cn(
+                                    'inline-block mt-0.5 h-1.5 w-1.5 rounded-full shrink-0',
+                                    a.status === 'confirmed' ? 'bg-success' :
+                                    a.status === 'invalidated' ? 'bg-destructive' : 'bg-warning'
+                                  )} />
+                                  <span>{a.text} <span className="text-muted-foreground/50">({a.status})</span></span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-xs text-muted-foreground/40 italic">No assumptions recorded</p>
+                          )}
+                        </div>
+
+                        {/* Dependencies */}
+                        <div>
+                          <h5 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <Link2 className="h-3 w-3" /> Dependencies
+                          </h5>
+                          {mod.dependencies && mod.dependencies.length > 0 ? (
+                            <ul className="space-y-1">
+                              {mod.dependencies.map((d, idx) => (
+                                <li key={idx} className="text-xs text-foreground/70 flex items-start gap-2">
+                                  <span className={cn(
+                                    'inline-block mt-0.5 h-1.5 w-1.5 rounded-full shrink-0',
+                                    d.status === 'received' ? 'bg-success' :
+                                    d.status === 'overdue' ? 'bg-destructive' : 'bg-warning'
+                                  )} />
+                                  <span>{d.description} <span className="text-muted-foreground/50">({d.status})</span></span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-xs text-muted-foreground/40 italic">No dependencies</p>
+                          )}
+                        </div>
+
+                        {/* Status label */}
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className={cn('text-[10px] font-medium px-2 py-0.5 rounded-md', config.bg, config.color)}>
+                            {config.label}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">Owner: {mod.owner}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             );
           })}
@@ -140,21 +234,12 @@ function ProjectDetail({ projectId }: { projectId: string }) {
           </div>
         </div>
       )}
-
-      {/* View roadmap CTA */}
-      <button
-        onClick={() => navigate(`/consultant/${projectId}/map`)}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/5 hover:bg-primary/8 border border-primary/10 hover:border-primary/20 transition-all text-sm font-medium text-primary"
-      >
-        <TrendingUp className="h-4 w-4" />
-        View Live Roadmap
-      </button>
     </div>
   );
 }
 
 export default function TeamHome() {
-  const navigate = useNavigate();
+  
   const projectsQ = useQuery({ queryKey: ['projects'], queryFn: getProjects });
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
