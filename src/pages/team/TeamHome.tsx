@@ -148,7 +148,7 @@ function ProjectDetail({ projectId }: { projectId: string }) {
                                   <span className={cn(
                                     'inline-block mt-0.5 h-1.5 w-1.5 rounded-full shrink-0',
                                     a.status === 'confirmed' ? 'bg-success' :
-                                    a.status === 'rejected' ? 'bg-destructive' : 'bg-amber-400'
+                                    a.status === 'invalidated' ? 'bg-destructive' : 'bg-warning'
                                   )} />
                                   <span>{a.text} <span className="text-muted-foreground/50">({a.status})</span></span>
                                 </li>
