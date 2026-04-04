@@ -59,15 +59,16 @@ export function DetourSegment({ data }: DetourSegmentProps) {
         style={{ pointerEvents: 'none' }}
       >
         <div style={{
-          background: 'rgba(239,68,68,0.08)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(239,68,68,0.2)',
+          background: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(239,68,68,0.3)',
           borderRadius: '4px',
           padding: '3px 8px',
           maxWidth: '140px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         }}>
           <span style={{
-            color: '#fca5a5',
+            color: '#dc2626',
             fontSize: '8px',
             fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 500,
@@ -77,7 +78,7 @@ export function DetourSegment({ data }: DetourSegmentProps) {
             Blocked
           </span>
           <div style={{
-            color: '#a1a1aa',
+            color: '#6b7280',
             fontSize: '9px',
             fontFamily: 'Inter, system-ui, sans-serif',
             marginTop: '2px',

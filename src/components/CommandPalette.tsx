@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Command, Sparkles, Map, Activity, FolderOpen, ArrowRight } from 'lucide-react';
+import { Command, Sparkles, Map, Activity, FolderOpen, Navigation, MessageSquare, Brain, ArrowRight } from 'lucide-react';
 
 interface CommandItem {
   id: string;
@@ -17,6 +17,20 @@ export function CommandPalette() {
   const navigate = useNavigate();
 
   const commands: CommandItem[] = [
+    {
+      id: 'interview',
+      label: 'AI Interview',
+      description: 'Start AI-led discovery interview',
+      icon: MessageSquare,
+      action: () => navigate('/consultant/proj-1/interview'),
+    },
+    {
+      id: 'journey',
+      label: '3D Journey',
+      description: 'Open immersive 3D project map',
+      icon: Navigation,
+      action: () => navigate('/consultant/proj-1/journey'),
+    },
     {
       id: 'cocreate',
       label: 'Co-Create Plan',
@@ -37,6 +51,13 @@ export function CommandPalette() {
       description: 'Health metrics, blockers, and AI signals',
       icon: Activity,
       action: () => navigate('/consultant/proj-1/tracking'),
+    },
+    {
+      id: 'mission',
+      label: 'Mission Control',
+      description: 'Delivery team module overview',
+      icon: Brain,
+      action: () => navigate('/team'),
     },
     {
       id: 'projects',

@@ -8,6 +8,7 @@ import { ModuleLandmark } from './ModuleLandmark';
 import { ProgressPulse } from './ProgressPulse';
 import { CameraController } from './CameraController';
 import { DetourSegment } from './DetourSegment';
+import { MeetingMarker } from './MeetingMarker';
 import { MapHUD } from './MapHUD';
 import type { MapGeometry, CameraMode } from '@/types/three';
 
@@ -35,7 +36,6 @@ function SceneContent({ geometry, cameraMode, setCameraMode, focusId, setFocusId
 
   const handleLandmarkClick = (id: string) => {
     if (focusId === id) {
-      // Click same landmark again → go back to overview
       setFocusId(null);
       setCameraMode('overview');
     } else {
@@ -64,6 +64,11 @@ function SceneContent({ geometry, cameraMode, setCameraMode, focusId, setFocusId
         <DetourSegment key={d.id} data={d} roadCurve={curve} />
       ))}
 
+      {/* Meeting notes as terrain hillocks */}
+      {(geometry.meetingMarkers ?? []).map((mm) => (
+        <MeetingMarker key={mm.id} data={mm} />
+      ))}
+
       <CameraController
         mode={cameraMode}
         curve={curve}
@@ -90,7 +95,7 @@ export function ImmersiveScene({ geometry, driftDays, targetDate }: ImmersiveSce
   const [focusId, setFocusId] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full h-full bg-[#0a0a0b]">
+    <div className="relative w-full h-full bg-[#f4f3f0]">
       <Canvas
         camera={{ position: [0, 65, 40], fov: 55, near: 0.5, far: 500 }}
         dpr={[1, 2]}

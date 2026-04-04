@@ -80,15 +80,16 @@ export function ProgressPulse({ curve, progress }: ProgressPulseProps) {
         style={{ pointerEvents: 'none' }}
       >
         <div style={{
-          background: 'rgba(124,58,237,0.12)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(124,58,237,0.25)',
+          background: 'rgba(255,255,255,0.85)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(124,58,237,0.2)',
           borderRadius: '4px',
           padding: '3px 8px',
           whiteSpace: 'nowrap',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         }}>
           <span style={{
-            color: '#c4b5fd',
+            color: '#5b21b6',
             fontSize: '9px',
             fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 500,

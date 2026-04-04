@@ -1,5 +1,6 @@
 import type { Vector3 } from 'three';
 import type { Module } from './index';
+import type { MeetingNote } from '@/api/mockMeetingNotes';
 
 export interface LandmarkData {
   id: string;
@@ -24,12 +25,20 @@ export interface TimeMarker {
   position: Vector3;
 }
 
+export interface MeetingMarkerData {
+  id: string;
+  meeting: MeetingNote;
+  position: Vector3;
+  side: 'left' | 'right';
+}
+
 export interface MapGeometry {
   pathPoints: Vector3[];
   landmarks: LandmarkData[];
   pulseT: number; // 0..1 progress on the curve
   detours: DetourData[];
   timeMarkers: TimeMarker[];
+  meetingMarkers: MeetingMarkerData[];
   totalModules: number;
   completedModules: number;
 }

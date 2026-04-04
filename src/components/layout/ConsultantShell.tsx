@@ -1,11 +1,12 @@
 import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
-import { Brain, Sparkles, Map, Activity, ChevronDown, Command, LogOut, Navigation } from 'lucide-react';
+import { Brain, Sparkles, Map, Activity, ChevronDown, Command, LogOut, Navigation, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { getProjects } from '@/api/projects';
 import { useState, useEffect, useRef } from 'react';
 
 const navItems = [
+  { label: 'Interview', icon: MessageSquare, path: 'interview', description: 'AI discovery' },
   { label: 'Co-Create', icon: Sparkles, path: 'cocreate', description: 'Plan with AI' },
   { label: 'Live Map', icon: Map, path: 'map', description: 'Roadmap view' },
   { label: 'Journey', icon: Navigation, path: 'journey', description: '3D immersive map' },

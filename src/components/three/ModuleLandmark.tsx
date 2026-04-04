@@ -23,8 +23,8 @@ export function ModuleLandmark({ data, onClick }: ModuleLandmarkProps) {
   const isComplete = mod.status === 'complete';
   const isActive = mod.status === 'in_progress';
 
-  // Base brightness: complete = bright white, active = medium, others = dim
-  const brightness = isComplete ? 0.9 : isActive ? 0.7 : isBlocked ? 0.35 : 0.25;
+  // Light mode brightness: complete = very dark charcoal, active = dark, not_started = faint
+  const brightness = isComplete ? 0.12 : isActive ? 0.22 : isBlocked ? 0.45 : 0.78;
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
@@ -64,13 +64,13 @@ export function ModuleLandmark({ data, onClick }: ModuleLandmarkProps) {
         />
       </mesh>
 
-      {/* Thin base line */}
+      {/* Thin base shadow */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[2.4, 1]} />
         <meshStandardMaterial
-          color="#27272a"
+          color="#1c1c1e"
           transparent
-          opacity={0.4}
+          opacity={0.08}
         />
       </mesh>
 
@@ -83,18 +83,19 @@ export function ModuleLandmark({ data, onClick }: ModuleLandmarkProps) {
       >
         <div
           style={{
-            background: hovered ? 'rgba(24,24,27,0.92)' : 'rgba(24,24,27,0.7)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(113,113,122,0.15)',
+            background: hovered ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '6px',
             padding: '6px 10px',
             whiteSpace: 'nowrap',
             transition: 'all 0.2s ease',
             transform: hovered ? 'scale(1.05)' : 'scale(1)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           }}
         >
           <div style={{
-            color: isComplete ? '#e4e4e7' : isActive ? '#c4b5fd' : '#71717a',
+            color: isComplete ? '#1c1c1e' : isActive ? '#5b21b6' : '#6b7280',
             fontSize: '11px',
             fontFamily: 'Inter, system-ui, sans-serif',
             fontWeight: 500,
@@ -104,7 +105,7 @@ export function ModuleLandmark({ data, onClick }: ModuleLandmarkProps) {
           </div>
           {hovered && (
             <div style={{
-              color: '#52525b',
+              color: '#9ca3af',
               fontSize: '9px',
               fontFamily: 'JetBrains Mono, monospace',
               marginTop: '2px',

@@ -9,12 +9,18 @@ import { ConsultantShell } from "./components/layout/ConsultantShell";
 import CoCreate from "./pages/consultant/CoCreate";
 import LiveMap from "./pages/consultant/LiveMap";
 import Tracking from "./pages/consultant/Tracking";
-import TeamHome from "./pages/team/TeamHome";
+import MissionControl from "./pages/team/MissionControl";
 import NotFound from "./pages/NotFound";
 import { CommandPalette } from "./components/CommandPalette";
+import { TeamShell } from "./components/layout/TeamShell";
 
-// Lazy-load heavy 3D page to avoid blocking initial bundle with three.js
+// Lazy-load interview page
+const AIInterview = lazy(() => import("./pages/consultant/AIInterview"));
+
+// Lazy-load heavy 3D pages (three.js bundle)
 const ImmersiveMap = lazy(() => import("./pages/consultant/ImmersiveMap"));
+const TeamJourney = lazy(() => import("./pages/team/TeamJourney"));
+const ModuleWorkstation = lazy(() => import("./pages/team/ModuleWorkstation"));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -42,15 +48,22 @@ function AppRoutes() {
         <Route path="/" element={<Navigate to={role === 'consultant' ? '/consultant' : '/team'} replace />} />
         <Route path="/consultant" element={<ConsultantHome />} />
         <Route path="/consultant/:id" element={<ConsultantShell />}>
-          <Route index element={<Navigate to="cocreate" replace />} />
+          <Route index element={<Navigate to="interview" replace />} />
+          <Route path="interview" element={<Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-[#f4f3f0]"><div className="text-gray-400 text-sm font-mono">Loading...</div></div>}><AIInterview /></Suspense>} />
           <Route path="cocreate" element={<CoCreate />} />
           <Route path="map" element={<LiveMap />} />
-          <Route path="journey" element={<Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-[#0a0a0b]"><div className="text-zinc-500 text-sm font-mono">Loading 3D scene...</div></div>}><ImmersiveMap /></Suspense>} />
+          <Route path="journey" element={<Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-[#f4f3f0]"><div className="text-gray-400 text-sm font-mono">Loading 3D scene...</div></div>}><ImmersiveMap /></Suspense>} />
           <Route path="tracking" element={<Tracking />} />
         </Route>
 
         {/* Delivery Team Portal */}
-        <Route path="/team" element={<TeamHome />} />
+        <Route path="/team" element={<MissionControl />} />
+        <Route path="/team/:projectId" element={<TeamShell />}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<MissionControl />} />
+          <Route path="journey" element={<Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-[#f4f3f0]"><div className="text-gray-400 text-sm font-mono">Loading 3D scene...</div></div>}><TeamJourney /></Suspense>} />
+          <Route path="module/:moduleId" element={<Suspense fallback={<div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-[#f4f3f0]"><div className="text-gray-400 text-sm font-mono">Loading...</div></div>}><ModuleWorkstation /></Suspense>} />
+        </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>
